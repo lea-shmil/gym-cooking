@@ -27,5 +27,8 @@ setup(name='gym_cooking',
             'six==1.15.0',
             'termcolor==1.1.0',
             'tqdm==4.50.1',
+            # lea added changes to use baselines
+            'stable-baselines3==1.4.0',
+
           ]
       )

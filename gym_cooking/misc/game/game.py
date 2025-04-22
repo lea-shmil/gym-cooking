@@ -1,8 +1,8 @@
 import os
 import pygame
 import numpy as np
-from utils.core import *
-from misc.game.utils import *
+from gym_cooking.utils.core import *
+from gym_cooking.misc.game.utils import *
 
 graphics_dir = 'misc/game/graphics'
 _image_library = {}

@@ -117,17 +117,30 @@ def main_loop(arglist):
             successful=env.successful)
 
 if __name__ == '__main__':
-    arglist = parse_arguments()
-    if arglist.play:
-        env = gym.envs.make("gym_cooking:overcookedEnv-v0", arglist=arglist)
-        env.reset()
-        game = GamePlay(env.filename, env.world, env.sim_agents)
-        game.on_execute()
-    else:
-        model_types = [arglist.model1, arglist.model2, arglist.model3, arglist.model4]
-        assert len(list(filter(lambda x: x is not None,
-            model_types))) == arglist.num_agents, "num_agents should match the number of models specified"
-        fix_seed(seed=arglist.seed)
-        main_loop(arglist=arglist)
+        arglist = parse_arguments()
+        if arglist.play:
+            env = gym.envs.make("gym_cooking:overcookedEnv-v0", arglist=arglist)
+            env.reset()
+
+            # Pass env to some RL baseline and see if it works
+
+            game = GamePlay(env.filename, env.world, env.sim_agents)
+            game.on_execute()
+        else:
+            model_types = [arglist.model1, arglist.model2, arglist.model3, arglist.model4]
+            assert len(list(filter(lambda x: x is not None,
+                model_types))) == arglist.num_agents, "num_agents should match the number of models specified"
+            fix_seed(seed=arglist.seed)
+            main_loop(arglist=arglist)
 
 
+
+    # import pickle
+    #
+    # # Step 2: Open the pickle file in binary read mode
+    # with open('misc/metrics/pickles/partial-divider_salad_agents2_seed1_model1-bd_model2-bd.pkl', 'rb') as file:
+    #     # Step 3: Load the data from the file
+    #     data = pickle.load(file)
+    #
+    # # Now you can use the 'data' variable
+    # print(data)

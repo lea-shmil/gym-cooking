@@ -1,21 +1,23 @@
 # Recipe planning
-from recipe_planner.stripsworld import STRIPSWorld
-import recipe_planner.utils as recipe
-from recipe_planner.recipe import *
+import os
+
+from gym_cooking.recipe_planner.stripsworld import STRIPSWorld
+import gym_cooking.recipe_planner.utils as recipe
+from gym_cooking.recipe_planner.recipe import *
 
 # Delegation planning
-from delegation_planner.bayesian_delegator import BayesianDelegator
+from gym_cooking.delegation_planner.bayesian_delegator import BayesianDelegator
 
 # Navigation planning
-import navigation_planner.utils as nav_utils
+import gym_cooking.utils as nav_utils
 
 # Other core modules
-from utils.interact import interact
-from utils.world import World
-from utils.core import *
-from utils.agent import SimAgent
-from misc.game.gameimage import GameImage
-from utils.agent import COLORS
+from gym_cooking.utils.interact import interact
+from gym_cooking.utils.world import World
+from gym_cooking.utils.core import *
+from gym_cooking.utils.agent import SimAgent
+from gym_cooking.misc.game.gameimage import GameImage
+from gym_cooking.utils.agent import COLORS
 
 import copy
 import networkx as nx
@@ -91,7 +93,11 @@ class OvercookedEnvironment(gym.Env):
     def load_level(self, level, num_agents):
         x = 0
         y = 0
-        with open('utils/levels/{}.txt'.format(level), 'r') as file:
+        # Construct the correct path relative to this file
+        base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../utils/levels"))
+        level_path = os.path.join(base_path, f"{level}.txt")
+
+        with open(level_path, 'r') as file:
             # Mark the phases of reading.
             phase = 1
             for line in file:
