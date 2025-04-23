@@ -1,6 +1,8 @@
 # Recipe planning
 import os
 
+from gym.spaces import Box, Discrete
+
 from gym_cooking.recipe_planner.stripsworld import STRIPSWorld
 import gym_cooking.recipe_planner.utils as recipe
 from gym_cooking.recipe_planner.recipe import *
@@ -9,7 +11,7 @@ from gym_cooking.recipe_planner.recipe import *
 from gym_cooking.delegation_planner.bayesian_delegator import BayesianDelegator
 
 # Navigation planning
-import gym_cooking.utils as nav_utils
+import gym_cooking.navigation_planner.utils as nav_utils
 
 # Other core modules
 from gym_cooking.utils.interact import interact
@@ -48,6 +50,10 @@ class OvercookedEnvironment(gym.Env):
         self.collisions = []
         self.termination_info = ""
         self.successful = False
+
+        # verified this is the correct observation space
+        self.observation_space = Box(low=0, high=255, shape=(560, 560, 3), dtype=np.uint8)
+        self.action_space = Discrete(8)
 
     def get_repr(self):
         return self.world.get_repr() + tuple([agent.get_repr() for agent in self.sim_agents])
