@@ -106,6 +106,7 @@ def main_loop(arglist):
     #might have to change arglist for environment because the make wont work for my new agent
     env = gym.envs.make("gym_cooking:overcookedEnv-v0", arglist=arglist)
     obs = env.reset()
+
     # game = GameVisualize(env)
     real_agents = initialize_agents(arglist=arglist, env=env)
     super_agent = RLSuperAgent(num_agents=arglist.num_agents)
@@ -136,10 +137,15 @@ def main_loop(arglist):
                     action_dict[agent.name] = final_actions[i]
 
         obs, reward, done, info = env.step(action_dict=action_dict)
+        print("this is reward" + reward)
+        print("this is info" + info)
+
 
         # Agents
         for agent in real_agents:
+            print("this is subtask" + agent.subtask)
             agent.refresh_subtasks(world=env.world)
+        #rl agents should recieve reward learn from it
 
         # Saving info
         bag.add_status(cur_time=info['t'], real_agents=real_agents)

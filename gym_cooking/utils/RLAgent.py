@@ -1,6 +1,5 @@
+import numpy as np
 from stable_baselines3 import PPO
-from stable_baselines3.common.vec_env import DummyVecEnv
-
 
 class RLAgent:
     def __init__(self, name, id_color, recipes, arglist, env):
@@ -10,15 +9,27 @@ class RLAgent:
         self.arglist = arglist
         self.model = PPO("MlpPolicy", env, verbose=1)
 
-    def train(self, timesteps=10000):
-        """Train the RL agent."""
-        print(f"Training {self.name} for {timesteps} timesteps...")
-        self.model.learn(total_timesteps=timesteps)
+        # Define the mapping from discrete actions to navigation actions
+        #written in utils.py
+        self.action_mapping = {
+            0: (0, -1),   # Move up
+            1: (0, 1),  # Move down
+            2: (-1, 0),  # Move left
+            3: (1, 0),   # Move right
+            4: (0, 0),   # No-op
+        }
 
     def select_action(self, obs):
-        """Use the trained model to predict an action."""
-        action, _ = self.model.predict(obs, deterministic=True)
-        return action
+        """
+        Select an action based on the preprocessed observation.
+        """
+        # Predict the action index
+        action_index, _ = self.model.predict(obs.game.get_image_obs(), deterministic=True)
 
+        # Map the action index to the corresponding navigation action
+        navigation_action = self.action_mapping.get(action_index, (0, 0))  # Default to no-op if invalid index
 
-    #TODO : implement the agent using RLSuperAgent should make decisions for all rl agents
+        return navigation_action
+
+#TODO implement reward learning logic
+#TODO check if reward contains proper rewards to learn both movement and cooking
