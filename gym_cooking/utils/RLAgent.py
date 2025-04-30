@@ -1,5 +1,6 @@
 import numpy as np
 from stable_baselines3 import PPO
+from stable_baselines3.common.vec_env import DummyVecEnv
 
 class RLAgent:
     def __init__(self, name, id_color, recipes, arglist, env):
@@ -7,7 +8,8 @@ class RLAgent:
         self.color = id_color
         self.recipes = recipes
         self.arglist = arglist
-        self.model = PPO("MlpPolicy", env, verbose=1)
+        self.vec_env = DummyVecEnv([lambda: env])
+        self.model = PPO("MlpPolicy", self.vec_env, verbose=1)
 
         # Define the mapping from discrete actions to navigation actions
         #written in utils.py
@@ -31,5 +33,14 @@ class RLAgent:
 
         return navigation_action
 
+    def train(self, total_timesteps=10000):
+        """
+        Train the RL agent using PPO.
+        """
+        # Use the environment to collect training data
+
+        self.model.learn(total_timesteps=total_timesteps)
+        self.model.save(f"{self.name}_ppo_model")  # Save the model after training
+
+
 #TODO implement reward learning logic
-#TODO check if reward contains proper rewards to learn both movement and cooking

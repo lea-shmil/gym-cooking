@@ -136,16 +136,15 @@ def main_loop(arglist):
                 if isinstance(agent, RLAgent):
                     action_dict[agent.name] = final_actions[i]
 
+        print("this is the action dict" + str(action_dict))
         obs, reward, done, info = env.step(action_dict=action_dict)
-        print("this is reward" + reward)
-        print("this is info" + info)
-
 
         # Agents
         for agent in real_agents:
-            print("this is subtask" + agent.subtask)
+            if isinstance(agent, RLAgent):
+                # RL agent: update the model with the new observation and reward
+                agent.train(total_timesteps=1000)  # Train periodically
             agent.refresh_subtasks(world=env.world)
-        #rl agents should recieve reward learn from it
 
         # Saving info
         bag.add_status(cur_time=info['t'], real_agents=real_agents)
