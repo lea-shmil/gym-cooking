@@ -197,11 +197,6 @@ class OvercookedEnvironment(gym.Env):
 
         # Get actions.
         for sim_agent in self.sim_agents:
-            print("this is action dict" + str(action_dict))
-            print(self.sim_agents)
-            print(sim_agent)
-            print(sim_agent.name)
-            print(action_dict[sim_agent.name])
             sim_agent.action = action_dict[sim_agent.name]
 
         # Check collisions.

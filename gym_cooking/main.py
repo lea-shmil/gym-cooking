@@ -112,44 +112,51 @@ def main_loop(arglist):
     real_agents = initialize_agents(arglist=arglist, env=env)
     super_agent = RLSuperAgent(num_agents=arglist.num_agents)
 
-    #if there is an rl agent change env to rl wrapper
-    env = OvercookedRLWrapper(env)
+    # if there is an rl agent change env to rl wrapper
+    if isinstance(real_agents[0], RLAgent):
+        env = OvercookedRLWrapper(env)
 
     # Info bag for saving pkl files
     bag = Bag(arglist=arglist, filename=env.filename)
     bag.set_recipe(recipe_subtasks=env.all_subtasks)
 
+    info = {"t": 0}
+
     while not env.done():
         action_dict = {}
-        observations = []
-        predictions = []
+        # observations = []
+        # predictions = []
+        #
+        # for agent in real_agents:
+        #     if isinstance(agent, RLAgent):
+        #         # Use the RL agent's select_action method
+        #         observations.append(obs)
+        #         predictions.append(agent.select_action(obs=obs))
+        #     else:
+        #         # Non-RL agent: same as before
+        #         action = agent.select_action(obs=obs)
+        #         action_dict[agent.name] = action
 
+        # Super-agent resolves conflicts for RL agents
+        #         if observations and predictions:
+        #             final_actions = super_agent.select_actions(observations, predictions)
+        #             for i, agent in enumerate(real_agents):
+        #                 if isinstance(agent, RLAgent):
+        #                     action_dict[agent.name] = final_actions[i]
+        #                     print("here the action dict is being updated" + str(action_dict))
         for agent in real_agents:
-            if isinstance(agent, RLAgent):
-                # Use the RL agent's select_action method
-                observations.append(obs)
-                predictions.append(agent.select_action(obs=obs))
-            else:
-                # Non-RL agent: same as before
+            if not isinstance(agent, RLAgent):
                 action = agent.select_action(obs=obs)
                 action_dict[agent.name] = action
 
-        # Super-agent resolves conflicts for RL agents
-        if observations and predictions:
-            final_actions = super_agent.select_actions(observations, predictions)
-            for i, agent in enumerate(real_agents):
-                if isinstance(agent, RLAgent):
-                    action_dict[agent.name] = final_actions[i]
-                    print("here the action dict is being updated" + str(action_dict))
+        if not isinstance(real_agents[0], RLAgent):
+            obs, reward, done, info = env.step(action_dict=action_dict)
+            for agent in real_agents:
+                agent.refresh_subtasks(world=env.world)
+        else:
+            real_agents[0].model.learn(total_timesteps=1000)  # Train periodically
+            real_agents[0].model.save("centralized_ppo_model")
 
-        obs, reward, done, info = env.step(action_dict=action_dict)
-
-        # Agents
-        for agent in real_agents:
-            if isinstance(agent, RLAgent):
-                # RL agent: update the model with the new observation and reward
-                agent.train(total_timesteps=1000)  # Train periodically
-            agent.refresh_subtasks(world=env.world)
 
         # Saving info
         bag.add_status(cur_time=info['t'], real_agents=real_agents)
