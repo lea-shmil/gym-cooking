@@ -1,7 +1,7 @@
 # Recipe planning
 import os
 
-from gym.spaces import Box, Discrete
+
 
 from gym_cooking.recipe_planner.stripsworld import STRIPSWorld
 import gym_cooking.recipe_planner.utils as recipe
@@ -50,10 +50,6 @@ class OvercookedEnvironment(gym.Env):
         self.collisions = []
         self.termination_info = ""
         self.successful = False
-
-        # verified this is the correct observation space
-        self.observation_space = Box(low=0, high=255, shape=(560, 560, 3), dtype=np.uint8)
-        self.action_space = Discrete(8)
 
     def get_repr(self):
         return self.world.get_repr() + tuple([agent.get_repr() for agent in self.sim_agents])
@@ -201,6 +197,11 @@ class OvercookedEnvironment(gym.Env):
 
         # Get actions.
         for sim_agent in self.sim_agents:
+            print("this is action dict" + str(action_dict))
+            print(self.sim_agents)
+            print(sim_agent)
+            print(sim_agent.name)
+            print(action_dict[sim_agent.name])
             sim_agent.action = action_dict[sim_agent.name]
 
         # Check collisions.

@@ -8,8 +8,8 @@ class RLAgent:
         self.color = id_color
         self.recipes = recipes
         self.arglist = arglist
-        self.vec_env = DummyVecEnv([lambda: env])
-        self.model = PPO("MlpPolicy", self.vec_env, verbose=1)
+        #self.vec_env = DummyVecEnv([lambda: env])
+        self.model = PPO("MlpPolicy", env, verbose=1)
 
         # Define the mapping from discrete actions to navigation actions
         #written in utils.py

@@ -1,5 +1,6 @@
 # from environment import OvercookedEnvironment
 # from gym_cooking.envs import OvercookedEnvironment
+from gym_cooking.envs.OvercookedRLWrapper import OvercookedRLWrapper
 from recipe_planner.recipe import *
 from utils.world import World
 from utils.agent import RealAgent, SimAgent, COLORS
@@ -85,7 +86,7 @@ def initialize_agents(arglist, env):
                             id_color=COLORS[len(real_agents)],
                             recipes=recipes,
                             arglist=arglist,
-                            env=env
+                            env=OvercookedRLWrapper(env)
                         )
                         real_agents.append(rl_agent)
                     else:
@@ -110,6 +111,10 @@ def main_loop(arglist):
     # game = GameVisualize(env)
     real_agents = initialize_agents(arglist=arglist, env=env)
     super_agent = RLSuperAgent(num_agents=arglist.num_agents)
+
+    #if there is an rl agent change env to rl wrapper
+    env = OvercookedRLWrapper(env)
+
     # Info bag for saving pkl files
     bag = Bag(arglist=arglist, filename=env.filename)
     bag.set_recipe(recipe_subtasks=env.all_subtasks)
@@ -135,8 +140,8 @@ def main_loop(arglist):
             for i, agent in enumerate(real_agents):
                 if isinstance(agent, RLAgent):
                     action_dict[agent.name] = final_actions[i]
+                    print("here the action dict is being updated" + str(action_dict))
 
-        print("this is the action dict" + str(action_dict))
         obs, reward, done, info = env.step(action_dict=action_dict)
 
         # Agents
