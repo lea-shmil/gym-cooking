@@ -15,6 +15,7 @@ import random
 import argparse
 from collections import namedtuple
 
+# from utils.logger import RecordTrajectories
 import gym
 
 
@@ -154,18 +155,19 @@ def main_loop(arglist):
             for agent in real_agents:
                 agent.refresh_subtasks(world=env.world)
         else:
+            #callback = RecordTrajectories()
             real_agents[0].model.learn(total_timesteps=1000)  # Train periodically
             real_agents[0].model.save("centralized_ppo_model")
 
-
         # Saving info
-        bag.add_status(cur_time=info['t'], real_agents=real_agents)
-
+        if not isinstance(real_agents[0], RLAgent):
+            bag.add_status(cur_time=info['t'], real_agents=real_agents)
 
     # Saving final information before saving pkl file
-    bag.set_collisions(collisions=env.collisions)
-    bag.set_termination(termination_info=env.termination_info,
-            successful=env.successful)
+    if not isinstance(real_agents[0], RLAgent):
+        bag.set_collisions(collisions=env.collisions)
+        bag.set_termination(termination_info=env.termination_info,
+                successful=env.successful)
 
 if __name__ == '__main__':
         arglist = parse_arguments()
@@ -186,7 +188,9 @@ if __name__ == '__main__':
             main_loop(arglist=arglist)
 
 
-
+ #TODO: MAIN RUNNING INDEFINITELY????
+# TODO: MAKE SURE TO PASS ON SYMBOLIC STATES AND NOT PIXELS BEFORE USING THE CALLBACK CODE
+#TODO: USE THE CALLBACK CODE TO SAVE THE OBSERVATIONS
     # import pickle
     #
     # # Step 2: Open the pickle file in binary read mode
