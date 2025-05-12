@@ -4,7 +4,7 @@ import os
 
 import string
 from pathlib import Path
-
+from gymnasium.spaces.utils import flatdim, Box
 
 def get_problem_template(template_file_path: Path) -> string.Template:
     """Extract the template object from the template file.
@@ -15,13 +15,16 @@ def get_problem_template(template_file_path: Path) -> string.Template:
         text = template_file.read()
         return string.Template(text)
 
-from gymnasium.spaces.utils import flatdim, Box
+
+
 
 
 class GymPDDL:
     def __init__(self, env, output_dir="solutions", do_learn=True, goal=-1):
         self.goal = goal
+        print(f"this is env {env} and env type is {type(env)} and env observation space is {env.observation_space}")
         self.env = env.unwrapped
+        print(f"this is env {env} and env type is {type(env)} and env observation space is {env.observation_space}")
         self.observation_space = env.observation_space
         self.action_space = env.action_space
         self.domain_name = env.spec.id
@@ -130,10 +133,10 @@ class GymPDDL:
         self.file_index += 1
 
     def generate_domain(
-        self,
-        instance_name: str,
-        state_space_size: int,
-        action_space_size: int,
+            self,
+            instance_name: str,
+            state_space_size: int,
+            action_space_size: int,
     ) -> None:
         """
         Generate a single basic planning problem instance.
@@ -147,12 +150,12 @@ class GymPDDL:
         template_mapping = {
             "instance_name": instance_name,
             "state_space": " ".join([f"(s{i})" for i in range(state_space_size)])
-            + " (r0)",
+                           + " (r0)",
         }
 
         if self.action_type == Box:
             template_mapping["state_space"] = (
-                "(parameter_amount ?p - parameter) " + template_mapping["state_space"]
+                    "(parameter_amount ?p - parameter) " + template_mapping["state_space"]
             )
 
             template_mapping["types"] = "(:types parameter - object)"
@@ -178,9 +181,9 @@ class GymPDDL:
             domain_file.write(template.substitute(template_mapping))
 
     def _generate_problem(
-        self,
-        instance_name: str,
-        initial_state: list,
+            self,
+            instance_name: str,
+            initial_state: list,
     ) -> None:
         """
         Generate a single basic planning problem instance.
@@ -201,14 +204,14 @@ class GymPDDL:
 
         if self.action_type == Box:
             template_mapping["objects"] = (
-                "(:objects "
-                + " ".join(
-                    [
-                        f"(= (parameter_amount {p}) {v})"
-                        for v, p in self.selection_space.items()
-                    ]
-                )
-                + " - parameter)"
+                    "(:objects "
+                    + " ".join(
+                [
+                    f"(= (parameter_amount {p}) {v})"
+                    for v, p in self.selection_space.items()
+                ]
+            )
+                    + " - parameter)"
             )
         else:
             template_mapping["objects"] = ""

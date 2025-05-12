@@ -1,3 +1,5 @@
+import json
+
 import numpy as np
 from gym import Wrapper
 from gym.spaces import Box, MultiDiscrete
@@ -10,10 +12,17 @@ class OvercookedRLWrapper(Wrapper):
         super().__init__(env)
 
         grid_size = env.world.width * env.world.height
-        num_heldable_objects = sum(len(obj_group) for obj_group in self.env.get_repr())
-        vector_length = grid_size + 3 * num_heldable_objects
+        repr = self.env.get_repr()
+        numb_holdable_objects = sum(len(obj_group) if (isinstance(obj_group, tuple) and not isinstance(obj_group, AgentRepr)) else 1 for obj_group in repr)
+        vector_length = grid_size + 3 * numb_holdable_objects
         self.observation_space = Box(low=0, high=255, shape=(vector_length,), dtype=np.uint8)
         self.action_space = MultiDiscrete([5, 5])
+        self.log_file = "env_log.txt"  # File to log states and actions
+
+        # Clear the log file at the start
+        with open(self.log_file, "w") as log:
+            log.write("")
+
 
     def reset(self):
         # Call the original environment's reset method
@@ -21,6 +30,14 @@ class OvercookedRLWrapper(Wrapper):
         return self._process_observation(self.env.get_repr(), self.env.world.get_object_list())
 
     def step(self, action_arr):
+
+        # Log the current state before the action
+        state = self._process_observation(self.env.get_repr(), self.env.world.get_object_list())
+        with open(self.log_file, "a") as log:
+            log.write("State:\n")
+            log.write(np.array2string(state) + "\n")  # Write the state as a raw array
+
+
         # Call the original environment's step method
         action_mapping = {
             0: (0, -1),  # Move up
@@ -33,15 +50,20 @@ class OvercookedRLWrapper(Wrapper):
         action_dict["agent-1"] = action_mapping[action_arr[0]]
         action_dict["agent-2"] = action_mapping[action_arr[1]]
 
+        with open(self.log_file, "a") as log:
+            log.write("Actions:\n")
+            log.write(json.dumps(action_dict) + "\n")
+
         obs, reward, done, info = self.env.step(action_dict)
         if 'obs' in info:
             del info['obs']
-        return self._process_observation(self.env.get_repr(), self.env.world.get_object_list()), reward, done, info
+
+        return state, reward, done, info
 
     def _process_observation(self, obs_repr, world_objects):
         # Dynamically calculate vector length
         grid_size = self.env.world.width * self.env.world.height
-        num_objects = sum(len(obj_group) for obj_group in obs_repr)
+        num_objects = sum(len(obj_group) if (isinstance(obj_group, tuple) and not isinstance(obj_group, AgentRepr)) else 1 for obj_group in obs_repr)
         vector_length = grid_size + num_objects * 3
 
         # Initialize the vector
@@ -72,4 +94,5 @@ class OvercookedRLWrapper(Wrapper):
                     vector[offset + 1] = y  # Y-coordinate
                     vector[offset + 2] = int(obj.is_held)  # Held status
                     offset += 3
+        print("this is the vector" + "\n" + str(vector))
         return vector

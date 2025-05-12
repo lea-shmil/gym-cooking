@@ -38,6 +38,9 @@ class RecordTrajectories(BaseCallback):
         # self.last_pos = None
 
     def get_env(self):
+
+        print( f"self env {self.env}")
+        print(f"self locals {self.locals}")
         """Get the current environment"""
         if self.env is None:
             if "env" in self.locals:
@@ -82,6 +85,8 @@ class RecordTrajectories(BaseCallback):
 
     def _on_training_start(self) -> None:
         env = self.get_env()
+        print(f"self observation space {env.observation_space}")
+        print(f"env is {env} and type is {type(env)}")
         self.pddl = GymPDDL(env)
 
         # self.pddl.state_into_dict(env._state)

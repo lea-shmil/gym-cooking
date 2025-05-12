@@ -15,7 +15,7 @@ import random
 import argparse
 from collections import namedtuple
 
-# from utils.logger import RecordTrajectories
+from utils.logger import RecordTrajectories
 import gym
 
 
@@ -111,7 +111,7 @@ def main_loop(arglist):
 
     # game = GameVisualize(env)
     real_agents = initialize_agents(arglist=arglist, env=env)
-    super_agent = RLSuperAgent(num_agents=arglist.num_agents)
+    #super_agent = RLSuperAgent(num_agents=arglist.num_agents)
 
     # if there is an rl agent change env to rl wrapper
     if isinstance(real_agents[0], RLAgent):
@@ -156,7 +156,7 @@ def main_loop(arglist):
                 agent.refresh_subtasks(world=env.world)
         else:
             #callback = RecordTrajectories()
-            real_agents[0].model.learn(total_timesteps=1000)  # Train periodically
+            real_agents[0].model.learn(total_timesteps=5000)  # add callback
             real_agents[0].model.save("centralized_ppo_model")
 
         # Saving info

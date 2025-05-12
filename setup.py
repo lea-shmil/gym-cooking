@@ -14,7 +14,7 @@ setup(name='gym_cooking',
             'gym==0.17.2',
             'matplotlib==3.3.2',
             'networkx==2.5',
-            'numpy==1.19.2',
+            #'numpy==1.19.2',
             'pandas==1.1.2',
             'Pillow>=8.1.1',
             'pygame==1.9.6',
@@ -29,6 +29,8 @@ setup(name='gym_cooking',
             'tqdm==4.50.1',
             # lea added changes to use baselines
             'stable-baselines3==1.4.0',
-
+            'gymnasium[classic-control]==1.1.1'
+            # for gymnasium we need a higher version of numpy
+            'numpy==1.23.5'
           ]
       )
