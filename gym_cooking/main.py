@@ -15,7 +15,7 @@ import random
 import argparse
 from collections import namedtuple
 
-from utils.logger import RecordTrajectories
+#from utils.logger import RecordTrajectories
 import gym
 
 
@@ -156,7 +156,7 @@ def main_loop(arglist):
                 agent.refresh_subtasks(world=env.world)
         else:
             #callback = RecordTrajectories()
-            real_agents[0].model.learn(total_timesteps=5000)  # add callback
+            real_agents[0].model.learn(total_timesteps=100000)  # add callback
             real_agents[0].model.save("centralized_ppo_model")
 
         # Saving info
