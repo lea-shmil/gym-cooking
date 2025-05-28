@@ -5,81 +5,258 @@
   (holding  ?a - agent ?o - object)
   (object_at ?o - object ?c - cell)
   (is_cut-board ?c - cell)
-  (needs_chop ?o - object)
-  (is_chopped ?o - object)
   (is_deliverable ?o - object)
   (delivery_spot ?c - cell)
   (is_held ?o - object)
   (mergeable ?o1 - object ?o2 - object)
-  (is_plate ?c - cell)
   (is_counter ?c - cell)
   (occupied ?c - cell)
   (is_delivery ?c - cell)
-)
-(:functions
-  (x_cell ?c - cell)
-  (y_cell ?c - cell)
-  (cell_type ?c - cell)
+
+  (adjacent? ?c1 - cell ?c2 - cell)
+  (is_floor? ?c - cell)
+  (holding_nothing? ?a - agent)
+  (tomato? ?o - object)
+  (lettuce? ?o - object)
+  (plate? ?o - object)
+  (chopped_lettuce? ?o - object)
+  (chopped_tomato? ?o - object)
+
 )
 
-(:action move-north
+
+(:fluents
+  (total_inventory)
+)
+
+(:constants
+  agent - agent
+  object - object
+)
+
+# when agent moves how to make sure everything they carry moves?'
+#can carry tomato, lettuce, plate, chopped lettuce, chopped tomato, chopped lettuce on a plate, chopped tomato on a plate
+#can carry salad on place, salad
+
+(:action move
   :parameters (?a - agent ?start - cell ?end - cell)
-  :precondition (and (agent_at ?a ?start)
-  (= (y_cell ?start) (- (y_cell ?end) 1))
-  (= (x_cell ?start) (x_cell ?end))
-  (= (cell_type ?end) 0))
-  :effect (and  (not (agent_at ?a ?start)) (agent_at ?a ?end) )
+  :precondition (and
+  (agent_at ?a ?start)
+  (adjacent? ?start ?end)
+  (is_floor? ?end)
+  (holding_nothing? ?a))
+
+  :effect (and
+  (not (agent_at ?a ?start))
+  (agent_at ?a ?end) )
 )
 
-(:action move-south
-  :parameters (?a - agent ?start - cell ?end - cell)
-  :precondition (and (agent_at ?a ?start)
-    (= (y_cell ?start) (+ (y_cell ?end) 1))
-    (= (x_cell ?start) (x_cell ?end))
-    (= (cell_type ?end) 0)
-  )
-  :effect (and  (not (agent_at ?a ?start)) (agent_at ?a ?end))
+(:action move-tomato
+    :parameters (?a - agent ?start - cell ?end - cell ?obj - object)
+    :precondition (and
+      (agent_at ?a ?start)
+      (adjacent? ?start ?end)
+      (is_floor? ?end)
+      (holding ?a ?obj)
+      (object_at ?obj ?start)
+      (tomato? ?obj)
+    )
+    :effect (and
+      (not (agent_at ?a ?start))
+      (agent_at ?a ?end)
+       (not (object_at ?obj ?start))
+      (object_at ?obj ?end)
+    )
+
+(:action move-lettuce
+    :parameters (?a - agent ?start - cell ?end - cell ?obj - object)
+    :precondition (and
+      (agent_at ?a ?start)
+      (adjacent? ?start ?end)
+      (is_floor? ?end)
+      (holding ?a ?obj)
+      (object_at ?obj ?start)
+      (lettuce? ?obj)
+    )
+    :effect (and
+      (not (agent_at ?a ?start))
+      (agent_at ?a ?end)
+       (not (object_at ?obj ?start))
+      (object_at ?obj ?end)
+    )
 )
 
-(:action move-east
-  :parameters (?a - agent ?start - cell ?end - cell)
-  :precondition (and (agent_at ?a ?start)
-    (= (x_cell ?start) (- (x_cell ?end) 1))
-    (= (y_cell ?start) (y_cell ?end))
-    (= (cell_type ?end) 0)
-  )
-  :effect (and  (not (agent_at ?a ?start)) (agent_at ?a ?end))
+(:action move-plate
+    :parameters (?a - agent ?start - cell ?end - cell ?obj - object)
+    :precondition (and
+      (agent_at ?a ?start)
+      (adjacent? ?start ?end)
+      (is_floor? ?end)
+      (holding ?a ?obj)
+      (object_at ?obj ?start)
+      (plate? ?obj)
+    )
+    :effect (and
+      (not (agent_at ?a ?start))
+      (agent_at ?a ?end)
+       (not (object_at ?obj ?start))
+      (object_at ?obj ?end)
+    )
 )
 
-(:action move-west
-  :parameters (?a - agent ?start - cell ?end - cell)
-  :precondition (and (agent_at ?a ?start)
-    (= (x_cell ?start) (+ (x_cell ?end) 1))
-    (= (y_cell ?start) (y_cell ?end))
-    (= (cell_type ?end) 0)
-  )
-  :effect (and  (not (agent_at ?a ?start)) (agent_at ?a ?end))
+(:action move-chopped-lettuce
+    :parameters (?a - agent ?start - cell ?end - cell ?obj - object)
+    :precondition (and
+      (agent_at ?a ?start)
+      (adjacent? ?start ?end)
+      (is_floor? ?end)
+      (holding ?a ?obj)
+      (object_at ?obj ?start)
+      (chopped_lettuce? ?obj)
+    )
+    :effect (and
+      (not (agent_at ?a ?start))
+      (agent_at ?a ?end)
+       (not (object_at ?obj ?start))
+      (object_at ?obj ?end)
+    )
 )
 
-(:action chop-object
-  :parameters (?a - agent ?agent_loc - cell ?cut-board_loc - cell ?obj - object)
-  :precondition (and (agent_at ?a ?agent_loc)
-    (holding ?obj)
-    (is_cut-board ?cut-board_loc)
-    (needs_chop ?obj)
-    (not (is_chopped ?obj))
-    (or
-      (and (=(x_cell ?agent_loc) (x_cell ?cut-board_loc)) (=(y_cell ?agent_loc) (- (y_cell ?cut-board_loc))1))
-      (and (=(x_cell ?agent_loc) (x_cell ?cut-board_loc)) (=(y_cell ?agent_loc) (+ (y_cell ?cut-board_loc))1))
-      (and (=(y_cell ?agent_loc) (y_cell ?cut-board_loc)) (=(x_cell ?agent_loc) (- (x_cell ?cut-board_loc))1))
-      (and (=(y_cell ?agent_loc) (y_cell ?cut-board_loc)) (=(x_cell ?agent_loc) (+ (x_cell ?cut-board_loc))1))
+(:action move-chopped-tomato
+    :parameters (?a - agent ?start - cell ?end - cell ?obj - object)
+    :precondition (and
+      (agent_at ?a ?start)
+      (adjacent? ?start ?end)
+      (is_floor? ?end)
+      (holding ?a ?obj)
+      (object_at ?obj ?start)
+      (chopped_tomato? ?obj)
+    )
+    :effect (and
+      (not (agent_at ?a ?start))
+      (agent_at ?a ?end)
+       (not (object_at ?obj ?start))
+      (object_at ?obj ?end)
+    )
+)
+
+(:action move-chopped-lettuce-on-plate
+    :parameters (?a - agent ?start - cell ?end - cell ?obj1 - object ?obj2 - object)
+    :precondition (and
+      (agent_at ?a ?start)
+      (adjacent? ?start ?end)
+      (is_floor? ?end)
+      (holding ?a ?obj1)
+        (holding ?a ?obj2)
+      (object_at ?obj1 ?start)
+       (object_at ?obj2 ?start)
+       (chopped_lettuce? ?obj1)
+         (plate? ?obj2)
+    )
+    :effect (and
+      (not (agent_at ?a ?start))
+      (agent_at ?a ?end)
+       (not (object_at ?obj1 ?start))
+      (object_at ?obj1 ?end)
+         (not (object_at ?obj2 ?start))
+        (object_at ?obj2 ?end)
+    )
+)
+
+(:action move-chopped-tomato-on-plate
+    :parameters (?a - agent ?start - cell ?end - cell ?obj1 - object ?obj2 - object)
+    :precondition (and
+      (agent_at ?a ?start)
+      (adjacent? ?start ?end)
+      (is_floor? ?end)
+      (holding ?a ?obj1)
+      (holding ?a ?obj2)
+      (object_at ?obj1 ?start)
+       (object_at ?obj2 ?start)
+       (chopped_tomato? ?obj1)
+         (plate? ?obj2)
+    )
+    :effect (and
+      (not (agent_at ?a ?start))
+      (agent_at ?a ?end)
+      (not (object_at ?obj1 ?start))
+      (object_at ?obj1 ?end)
+      (not (object_at ?obj2 ?start))
+      (object_at ?obj2 ?end)
     )
   )
-  :effect (and
-    (not (needs_chop ?obj))
-    (is_chopped ?obj)
+
+  (:action move-salad
+    :parameters (?a - agent ?start - cell ?end - cell ?obj1 - object obj2? - object)
+    :precondition (and
+      (agent_at ?a ?start)
+      (adjacent? ?start ?end)
+      (is_floor? ?end)
+      (holding ?a ?obj1)
+      (holding ?a ?obj2)
+      (object_at ?obj1 ?start)
+      (object_at ?obj2 ?start)
+      (chopped-lettuce? ?obj1)
+      (chopped-tomato? ?obj2)
+    )
+    :effect (and
+      (not (agent_at ?a ?start))
+      (agent_at ?a ?end)
+      (not (object_at ?obj1 ?start))
+      (object_at ?obj1 ?end)
+      (not (object_at ?obj2 ?start))
+      (object_at ?obj2 ?end)
+    )
+   )
+
+
+   (:action move-salad-on-plate
+     :parameters (?a - agent ?start - cell ?end - cell ?obj1 - object ?obj2 - object ?obj3 - object)
+     :precondition (and
+       (agent_at ?a ?start)
+       (adjacent? ?start ?end)
+       (is_floor? ?end)
+       (holding ?a ?obj1)
+       (holding ?a ?obj2)
+       (holding ?a ?obj3)
+       (object_at ?obj1 ?start)
+       (object_at ?obj2 ?start)
+       (object_at ?obj3 ?start)
+       (chopped_lettuce? ?obj1)
+       (chopped_tomato? ?obj2)
+       (plate? ?obj3)
+     )
+        :effect (and
+        (not (agent_at ?a ?start))
+        (agent_at ?a ?end)
+        (not (object_at ?obj1 ?start))
+        (object_at ?obj1 ?end)
+        (not (object_at ?obj2 ?start))
+        (object_at ?obj2 ?end)
+        (not (object_at ?obj3 ?start))
+        (object_at ?obj3 ?end)
+        )
+
+
+(:action chop-tomato
+:parameters (?a - agent ?agent_loc - cell ?cut-board_loc - cell ?obj - object)
+:precondition (and
+  (agent_at ?a ?agent_loc)
+  (holding ?obj)
+  (is_cut-board ?cut-board_loc)
+  (tomato? ?obj)
+  (adjacent? ?agent_loc ?cut-board_loc)
   )
-)
+:effect (and
+    (is_chopped ?obj)
+    (not (tomato? ?obj))
+    (chopped_tomato? ?obj)
+    (object_at ?obj ?cut-board_loc)
+    )
+  )
+
+    (:action chop-lettuce
+
 
 (:action pickup-object
   :parameters (?a - agent ?agent_loc - cell ?obj_loc - cell ?obj - object)
