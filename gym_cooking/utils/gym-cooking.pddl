@@ -20,6 +20,7 @@
   (chopped_tomato_on_plate? ?o - object)
   (salad? ?o - object)
   (salad_on_plate? ?o - object)
+  (delivered? ?0 - object)
 )
 
 

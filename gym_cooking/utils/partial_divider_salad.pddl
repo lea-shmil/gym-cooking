@@ -1,5 +1,5 @@
-(define (problem grid-minecraft-current)
-(:domain grid-minecraft)
+(define (problem partial-divider_salad)
+(:domain grid_overcooked)
 (:objects
 	x0y0 x1y0 x2y0 x3y0 x4y0 x5y0 x6y0
 	x0y1 x1y1 x2y1 x3y1 x4y1 x5y1 x6y1
