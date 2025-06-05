@@ -1,0 +1,14 @@
+setuptools~=59.5.0
+numpy~=1.19.2
+gym~=0.17.2
+networkx~=2.5
+pygame~=1.9.6
+pillow~=10.4.0
+pandas~=1.1.2
+matplotlib~=3.3.2
+seaborn~=0.11.0
+dill~=0.3.2
+termcolor~=1.1.0
+gymnasium~=1.0.0
+requests~=2.32.3
+scipy~=1.5.2

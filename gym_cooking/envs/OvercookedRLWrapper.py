@@ -116,6 +116,7 @@ class OvercookedRLWrapper(Wrapper):
                     vector[offset + 2] = 1
                 else:
                     vector[offset + 2] = 2
+                offset += 3
         print("this is the vector" + "\n" + str(vector))
         return vector
 
@@ -131,7 +132,8 @@ def state_to_pddl(self, state, name_of_level,  world_width, world_height, pddl_f
     """
     with open(pddl_file_path, 'w') as pddl_file:
         # Write PDDL header
-        pddl_file.write("(define (problem" + name_of_level + ")\n")
+        pddl_file.write("; PDDL file for " + name_of_level + "\n")
+        pddl_file.write("(define (problem " + name_of_level + ")\n")
         pddl_file.write("(:domain grid_overcooked)\n")
 
         # grid cells
@@ -139,7 +141,15 @@ def state_to_pddl(self, state, name_of_level,  world_width, world_height, pddl_f
         for x in range(world_width):
             for y in range(world_height):
                 pddl_file.write(f"    x{x}y{y} - cell\n")
+
+        pddl_file.write("    a1 - agent\n")
+        pddl_file.write("    a2 - agent\n")
+        pddl_file.write("    p1 - object\n")
+        pddl_file.write("    p2 - object\n")
+        pddl_file.write("    l1 - object\n")
+        pddl_file.write("    t1 - object\n")
         pddl_file.write(")\n\n")
+
 
         # Define initial state
         pddl_file.write("(:init\n")
@@ -151,22 +161,34 @@ def state_to_pddl(self, state, name_of_level,  world_width, world_height, pddl_f
             if state[i] == world_object_map['Floor']:
                 pddl_file.write(f"    (is_floor x{x}y{y})\n")
             elif state[i] == world_object_map['Cutboard']:
-                pddl_file.write(f"    (is_cut_board x{x}y{y})\n")
+                pddl_file.write(f"    (is_cutting_board x{x}y{y})\n")
             elif state[i] == world_object_map['Delivery']:
                 pddl_file.write(f"    (delivery_spot x{x}y{y})\n")
             elif state[i] > world_object_map['Delivery']:
                 # go over map find key that matches the value of state[i]
+                flag_p = True
                 for key, value in world_object_map.items():
                     if value == state[i]:
-                        pddl_file.write(f"    (is_{key.lower()} x{x}y{y})\n")
-                        break
+                        if key.lower() == 'plate' and flag_p:
+                            # If it's a plate, we need to add the second plate assuming there are two plates
+                            pddl_file.write(f"    (object_at {key.lower()[0]}{2} x{x}y{y})\n")
+                            pddl_file.write(f"    (occupied x{x}y{y})\n")
+                            pddl_file.write(f"    ({key.lower()} {key.lower()[0]}{2})\n")
+                            flag_p = False
+                            continue
+                        pddl_file.write(f"    (object_at {key.lower()[0]}{1} x{x}y{y})\n")
+                        pddl_file.write(f"    (occupied x{x}y{y})\n")
+                        pddl_file.write(f"    ({key.lower()} {key.lower()[0]}{1})\n")
+
 
 
         # add agents
         offset = grid_size
-        for agent_id in range(2):  # Assuming 2 agents
-            x, y = state[offset], state[offset + 1]
-            pddl_file.write(f"    (agent_at a{agent_id} x{x}y{y})\n")
+        #todo fix agent starting locations and all other automation of problems according to new pddl
+        for i in range(2):  # Assuming 2 agents
+            x, y, num = state[offset], state[offset + 1], state[offset + 2]
+            pddl_file.write(f"    (agent_at a{num} x{x}y{y})\n")
+            pddl_file.write(f"    (holding_nothing a{num})\n")
             offset += 3
 
         # adjacency predicates
@@ -182,7 +204,87 @@ def state_to_pddl(self, state, name_of_level,  world_width, world_height, pddl_f
         pddl_file.write(")\n\n")
 
         # Define goal
+
+        # Define goal
         pddl_file.write("(:goal\n")
-        pddl_file.write("    (delivered " + name_of_level.split('_')[-1] + ")\n")
-        pddl_file.write(")\n")
-        pddl_file.write(")\n")
+        if "tomato" in name_of_level:
+            pddl_file.write("   (or\n")
+            pddl_file.write("        (and (delivered t1)\n")
+            pddl_file.write("             (tomato t1)\n")
+            pddl_file.write("             (plate t1)\n")
+            pddl_file.write("             (chopped t1))\n")
+            pddl_file.write("        (and (delivered p1)\n")
+            pddl_file.write("             (tomato p1)\n")
+            pddl_file.write("             (plate p1)\n")
+            pddl_file.write("             (chopped p1))\n")
+            pddl_file.write("        (and (delivered p2)\n")
+            pddl_file.write("             (tomato p2)\n")
+            pddl_file.write("             (plate p2)\n")
+            pddl_file.write("             (chopped p2))\n")
+        elif "salad" in name_of_level:
+            pddl_file.write("   (or\n")
+            pddl_file.write("        (and (delivered t1)\n")
+            pddl_file.write("             (tomato t1)\n")
+            pddl_file.write("             (plate t1)\n")
+            pddl_file.write("             (chopped t1)\n")
+            pddl_file.write("             (lettuce t1))\n")
+            pddl_file.write("        (and (delivered p1)\n")
+            pddl_file.write("             (tomato p1)\n")
+            pddl_file.write("             (plate p1)\n")
+            pddl_file.write("             (chopped p1)\n")
+            pddl_file.write("             (lettuce p1))\n")
+            pddl_file.write("        (and (delivered p2)\n")
+            pddl_file.write("             (tomato p2)\n")
+            pddl_file.write("             (plate p2)\n")
+            pddl_file.write("             (chopped p2)\n")
+            pddl_file.write("             (lettuce p2))\n")
+            pddl_file.write("        (and (delivered l1)\n")
+            pddl_file.write("             (lettuce l1)\n")
+            pddl_file.write("             (lettuce l1)\n")
+            pddl_file.write("             (plate l1)\n")
+            pddl_file.write("             (chopped l1))\n")
+        elif "tl" in name_of_level:
+            pddl_file.write("        (and \n")
+            pddl_file.write("             (or \n")
+            pddl_file.write("                 (and \n")
+            pddl_file.write("                     (delivered t1)\n")
+            pddl_file.write("                     (tomato t1)\n")
+            pddl_file.write("                     (plate t1)\n")
+            pddl_file.write("                     (chopped t1)\n")
+            pddl_file.write("                 )\n")
+            pddl_file.write("                 (and \n")
+            pddl_file.write("                     (delivered p1)\n")
+            pddl_file.write("                     (tomato p1)\n")
+            pddl_file.write("                     (plate p1)\n")
+            pddl_file.write("                     (chopped p1)\n")
+            pddl_file.write("                 )\n")
+            pddl_file.write("                 (and \n")
+            pddl_file.write("                     (delivered p2)\n")
+            pddl_file.write("                     (tomato p2)\n")
+            pddl_file.write("                     (plate p2)\n")
+            pddl_file.write("                     (chopped p2)\n")
+            pddl_file.write("                 )\n")
+            pddl_file.write("             )\n")
+            pddl_file.write("             (or \n")
+            pddl_file.write("                 (and \n")
+            pddl_file.write("                     (delivered p1)\n")
+            pddl_file.write("                     (lettuce p1)\n")
+            pddl_file.write("                     (plate p1)\n")
+            pddl_file.write("                     (chopped p1)\n")
+            pddl_file.write("                 )\n")
+            pddl_file.write("                 (and \n")
+            pddl_file.write("                     (delivered p2)\n")
+            pddl_file.write("                     (lettuce p2)\n")
+            pddl_file.write("                     (plate p2)\n")
+            pddl_file.write("                     (chopped p2)\n")
+            pddl_file.write("                 )\n")
+            pddl_file.write("                 (and \n")
+            pddl_file.write("                     (delivered l1)\n")
+            pddl_file.write("                     (lettuce l1)\n")
+            pddl_file.write("                     (plate l1)\n")
+            pddl_file.write("                     (chopped l1)\n")
+            pddl_file.write("                 )\n")
+            pddl_file.write("             )\n")
+        pddl_file.write("   )\n") #first or/and
+        pddl_file.write(")\n") # goal
+        pddl_file.write(")\n") # end of define
