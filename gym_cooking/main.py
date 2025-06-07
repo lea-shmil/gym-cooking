@@ -1,11 +1,11 @@
 # from environment import OvercookedEnvironment
 # from gym_cooking.envs import OvercookedEnvironment
 from gym_cooking.envs.OvercookedRLWrapper import OvercookedRLWrapper
+from gym_cooking.utils.plan_agent import plan_agent
 from recipe_planner.recipe import *
 from utils.world import World
 from utils.agent import RealAgent, SimAgent, COLORS
 from utils.RLAgent import RLAgent
-from utils.RLSuperAgent import RLSuperAgent
 from utils.core import *
 from misc.game.gameplay import GamePlay
 from misc.metrics.metrics_bag import Bag
@@ -82,14 +82,22 @@ def initialize_agents(arglist, env):
                     model_type = getattr(arglist, f"model{len(real_agents) + 1}")
                     if model_type == 'rl':
                         # Use your custom RL agent
-                        rl_agent = RLAgent(
+                        real_agent = RLAgent(
                             name='agent-' + str(len(real_agents) + 1),
                             id_color=COLORS[len(real_agents)],
                             recipes=recipes,
                             arglist=arglist,
                             env=OvercookedRLWrapper(env)
                         )
-                        real_agents.append(rl_agent)
+                    elif model_type == 'plan':
+                        #using plan agent
+                        real_agent = plan_agent(
+                            name='agent-' + str(len(real_agents) + 1),
+                            id_color=COLORS[len(real_agents)],
+                            recipes=recipes,
+                            arglist=arglist,
+                            env=env
+                        )
                     else:
                         # Default to RealAgent
                         real_agent = RealAgent(
@@ -98,7 +106,7 @@ def initialize_agents(arglist, env):
                             id_color=COLORS[len(real_agents)],
                             recipes=recipes
                         )
-                        real_agents.append(real_agent)
+                    real_agents.append(real_agent)
 
     return real_agents
 
@@ -147,20 +155,24 @@ def main_loop(arglist):
         #                     print("here the action dict is being updated" + str(action_dict))
         for agent in real_agents:
             if not isinstance(agent, RLAgent):
-                action = agent.select_action(obs=obs)
+                if isinstance(agent, plan_agent):
+                    action = agent.select_action()
+                else:
+                    action = agent.select_action(obs=obs)
                 action_dict[agent.name] = action
 
         if not isinstance(real_agents[0], RLAgent):
             obs, reward, done, info = env.step(action_dict=action_dict)
-            for agent in real_agents:
-                agent.refresh_subtasks(world=env.world)
-        else:
+            if isinstance(real_agents[0], RealAgent):
+                for agent in real_agents:
+                    agent.refresh_subtasks(world=env.world)
+        elif isinstance(real_agents[0], RLAgent):
             #callback = RecordTrajectories()
             real_agents[0].model.learn(total_timesteps=100000)  # add callback
             real_agents[0].model.save("centralized_ppo_model")
 
         # Saving info
-        if not isinstance(real_agents[0], RLAgent):
+        if isinstance(real_agents[0], RealAgent):
             bag.add_status(cur_time=info['t'], real_agents=real_agents)
 
     # Saving final information before saving pkl file

@@ -21,6 +21,8 @@ class OvercookedRLWrapper(Wrapper):
     def __init__(self, env):
         super().__init__(env)
 
+        #steps limiter
+        self.arg = 1000
         grid_size = env.world.width * env.world.height
         vector_length = grid_size + 3 * len(self.sim_agents)  # Each agent has 3 attributes: x, y, id
         self.observation_space = Box(low=0, high=255, shape=(vector_length,), dtype=np.uint8)
