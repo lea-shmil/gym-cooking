@@ -53,7 +53,7 @@ def get_api_response(delays: List[int]):
 
 if __name__ == "__main__":
 
-    level_name = "full-divider_salad"
+    level_name = "partial-divider_tomato"
 
     string_level = "../utils/pddls/" + level_name + ".pddl"
     data = {

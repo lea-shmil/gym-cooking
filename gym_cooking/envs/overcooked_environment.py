@@ -216,6 +216,7 @@ class OvercookedEnvironment(gym.Env):
         new_obs = copy.copy(self)
         # Get an image observation
         image_obs = self.game.get_image_obs()
+        image_obs = self.game.get_image_obs()
 
         done = self.done()
         reward = self.reward()

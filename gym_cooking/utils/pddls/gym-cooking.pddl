@@ -35,18 +35,21 @@
   (agent_at ?a ?start)
   (adjacent ?start ?end)
   (is_floor ?end)
+  (not (occupied ?end)) ; cannot move to an occupied cell
   )
   :effect (and
   (not (agent_at ?a ?start))
   (agent_at ?a ?end)
+  (occupied ?end) ; mark the new cell as occupied
+  (not (occupied ?start)) ; mark the old cell as not occupied
   )
 )
 
 
 ; --------------------------------------------------------------------------------------------------------------------
 
-; when chopping items are on cutting board
-; when chopping cannot hold anything
+; when chopping items are being held
+
 
 (:action chop
     :parameters (?a - agent ?agent_loc - cell ?cut-board_loc - cell ?obj - object)
@@ -54,9 +57,9 @@
         (agent_at ?a ?agent_loc)
         (is_cutting_board ?cut-board_loc)
         (not (chopped ?obj)) ; cannot chop if already chopped
-        (object_at ?obj ?cut-board_loc)
+        (holding ?a ?obj) ; must be holding the object to chop
         (adjacent ?agent_loc ?cut-board_loc)
-        (holding_nothing  ?a)
+        (not (occupied ?cut-board_loc)) ; cannot chop on an occupied cutting board
     )
     :effect
         (chopped ?obj)
@@ -76,33 +79,16 @@
     (object_at ?obj ?obj_loc)
     (adjacent ?agent_loc ?obj_loc)
     (holding_nothing  ?a)
-    (not (is_cutting_board ?obj_loc)) ; cannot pick up from cutting board
     )
   :effect (and
     (holding ?a ?obj)
     (not (object_at ?obj ?obj_loc))
     (not (holding_nothing  ?a))
+    (not (occupied ?obj_loc)) ; mark the cell as not occupied after picking up the object
     )
 )
 
 
-(:action pickup-from-cutting-board
-  :parameters (?a - agent ?agent_loc - cell ?obj_loc - cell ?obj - object)
-  :precondition (and
-    (is_cutting_board ?obj_loc) ; special pick up from cutting board
-    (or (not (tomato ?obj)) (chopped ?obj)) ; cannot pick up lettuce or tomato from cutting board unless chopped
-    (or (not (lettuce ?obj)) (chopped ?obj))
-    (agent_at ?a ?agent_loc)
-    (object_at ?obj ?obj_loc)
-    (adjacent ?agent_loc ?obj_loc)
-    (holding_nothing  ?a)
-  )
-  :effect (and
-    (holding ?a ?obj)
-    (not (object_at ?obj ?obj_loc))
-    (not (holding_nothing ?a))
-  )
-)
 
 ; --------------------------------------------------------------------------------------------------------------------
 ; delivered objects are removed
@@ -121,6 +107,7 @@
   :effect (and
     (delivered ?obj)
     (not (holding ?a ?obj))
+    (holding_nothing ?a)
   )
 )
 
@@ -147,6 +134,8 @@
   :effect (and
     (not (holding ?a ?held_obj))
     (plate ?counter_obj)
+    (holding ?a ?counter_obj) ; now holding the counter object
+    (not (object_at ?counter_obj ?target_loc)) ; remove the counter object from its previous location
   )
 )
 
@@ -162,9 +151,7 @@
     (not (plate ?held_obj)) ; cannot merge plate with plate
   )
   :effect (and
-    (not (holding ?a ?held_obj))
     (plate ?held_obj)
-    (object_at ?held_obj ?target_loc)
     (not (object_at ?counter_obj ?target_loc))
   )
 )
@@ -182,10 +169,9 @@
     (not (plate ?counter_obj)) ; cannot merge plate with plate
   )
   :effect (and
-    (not (holding ?a ?held_obj))
-    (object_at ?held_obj ?target_loc)
-    (tomato ?counter_obj)
-    (lettuce ?counter_obj)
+    (not (object_at ?counter_obj ?target_loc))
+    (tomato ?held_obj)
+    (lettuce ?held_obj)
   )
 )
 

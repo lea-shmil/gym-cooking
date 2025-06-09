@@ -1,0 +1,6 @@
+C:/Users/Administrator/Documents/GitHub/gym-cooking/gym_cooking/downward-release-24.06.1/builds/release/CMakeFiles/translate.dir
+C:/Users/Administrator/Documents/GitHub/gym-cooking/gym_cooking/downward-release-24.06.1/builds/release/CMakeFiles/edit_cache.dir
+C:/Users/Administrator/Documents/GitHub/gym-cooking/gym_cooking/downward-release-24.06.1/builds/release/CMakeFiles/rebuild_cache.dir
+C:/Users/Administrator/Documents/GitHub/gym-cooking/gym_cooking/downward-release-24.06.1/builds/release/search/CMakeFiles/downward.dir
+C:/Users/Administrator/Documents/GitHub/gym-cooking/gym_cooking/downward-release-24.06.1/builds/release/search/CMakeFiles/edit_cache.dir
+C:/Users/Administrator/Documents/GitHub/gym-cooking/gym_cooking/downward-release-24.06.1/builds/release/search/CMakeFiles/rebuild_cache.dir

@@ -200,8 +200,6 @@ if __name__ == '__main__':
             main_loop(arglist=arglist)
 
 
- #TODO: MAIN RUNNING INDEFINITELY????
-# TODO: MAKE SURE TO PASS ON SYMBOLIC STATES AND NOT PIXELS BEFORE USING THE CALLBACK CODE
 #TODO: USE THE CALLBACK CODE TO SAVE THE OBSERVATIONS
     # import pickle
     #

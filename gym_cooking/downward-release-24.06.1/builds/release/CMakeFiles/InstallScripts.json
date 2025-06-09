@@ -1,0 +1,8 @@
+{
+	"InstallScripts" : 
+	[
+		"C:/Users/Administrator/Documents/GitHub/gym-cooking/gym_cooking/downward-release-24.06.1/builds/release/cmake_install.cmake",
+		"C:/Users/Administrator/Documents/GitHub/gym-cooking/gym_cooking/downward-release-24.06.1/builds/release/search/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

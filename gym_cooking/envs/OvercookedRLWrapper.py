@@ -105,6 +105,8 @@ class OvercookedRLWrapper(Wrapper):
         for obj in world_objects:
             x, y = obj.location
             index = x * self.env.world.width + y
+
+            print("this is the object name: " + obj.name + " and the index is: " + str(index) +" " + str(x) + str(y))
             vector[index] = world_object_map.get(obj.name, -1)  # Use the mapping to encode the object type
 
         # Step 2: Encode only agents
@@ -156,19 +158,36 @@ def state_to_pddl(self, state, name_of_level,  world_width, world_height, pddl_f
         # Define initial state
         pddl_file.write("(:init\n")
 
+
+
         # add grid and objects
         grid_size = world_width * world_height
+
+        # add agents
+        offset = grid_size
+        agent_locs = {}
+        for i in range(2):  # Assuming 2 agents
+            x, y, num = state[offset], state[offset + 1], state[offset + 2]
+            pddl_file.write(f"    (agent_at a{num} x{x}y{y})\n")
+            pddl_file.write(f"    (holding_nothing a{num})\n")
+            pddl_file.write(f"    (occupied x{x}y{y})\n")
+            offset += 3
+            agent_locs[f'a{num}'] = (x, y)  # Store agent locations for later use
+        #
+        flag_p = True
         for i in range(grid_size):
             x, y = divmod(i, world_width)
             if state[i] == world_object_map['Floor']:
                 pddl_file.write(f"    (is_floor x{x}y{y})\n")
+                # not occupied if agents are not on the floor
+                if not any(agent_loc == (x, y) for agent_loc in agent_locs.values()):
+                    pddl_file.write(f"    (not (occupied x{x}y{y}))\n")
             elif state[i] == world_object_map['Cutboard']:
                 pddl_file.write(f"    (is_cutting_board x{x}y{y})\n")
             elif state[i] == world_object_map['Delivery']:
                 pddl_file.write(f"    (delivery_spot x{x}y{y})\n")
             elif state[i] > world_object_map['Delivery']:
                 # go over map find key that matches the value of state[i]
-                flag_p = True
                 for key, value in world_object_map.items():
                     if value == state[i]:
                         if key.lower() == 'plate' and flag_p:
@@ -181,17 +200,6 @@ def state_to_pddl(self, state, name_of_level,  world_width, world_height, pddl_f
                         pddl_file.write(f"    (object_at {key.lower()[0]}{1} x{x}y{y})\n")
                         pddl_file.write(f"    (occupied x{x}y{y})\n")
                         pddl_file.write(f"    ({key.lower()} {key.lower()[0]}{1})\n")
-
-
-
-        # add agents
-        offset = grid_size
-        #todo fix agent starting locations and all other automation of problems according to new pddl
-        for i in range(2):  # Assuming 2 agents
-            x, y, num = state[offset], state[offset + 1], state[offset + 2]
-            pddl_file.write(f"    (agent_at a{num} x{x}y{y})\n")
-            pddl_file.write(f"    (holding_nothing a{num})\n")
-            offset += 3
 
         # adjacency predicates
         for x in range(world_width):
@@ -242,7 +250,7 @@ def state_to_pddl(self, state, name_of_level,  world_width, world_height, pddl_f
             pddl_file.write("             (lettuce p2))\n")
             pddl_file.write("        (and (delivered l1)\n")
             pddl_file.write("             (lettuce l1)\n")
-            pddl_file.write("             (lettuce l1)\n")
+            pddl_file.write("             (tomato l1)\n")
             pddl_file.write("             (plate l1)\n")
             pddl_file.write("             (chopped l1))\n")
         elif "tl" in name_of_level:

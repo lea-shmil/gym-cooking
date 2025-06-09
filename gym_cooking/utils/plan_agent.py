@@ -1,5 +1,5 @@
 import os
-
+import shutil
 
 class plan_agent:
     def __init__(self, name, id_color, recipes, arglist, env):
@@ -12,6 +12,11 @@ class plan_agent:
         self.actions_queue = self._load_plan()
 
     def _load_plan(self):
+
+        # Define paths
+        sas_plan_path = r'C:\Users\Administrator\Documents\GitHub\gym-cooking\sas_plan'
+        shutil.copyfile(sas_plan_path, self.plan_file_path)
+
         """Load the plan from the relevant plan.txt file."""
         if not os.path.exists(self.plan_file_path):
             raise FileNotFoundError(f"Plan file not found: {self.plan_file_path}")
@@ -22,7 +27,7 @@ class plan_agent:
 
         for i, line in enumerate(lines):
             line = line.strip()
-            if line == "" or line.isspace() or line.startswith("(REACH-GOAL"):
+            if line == "" or line.isspace() or line.startswith("(REACH-GOAL") or line.startswith(";"):
                 # Skip REACH-GOAL
                 continue
             elif line.startswith("(DELIVER") and i == len(lines) - 1:
