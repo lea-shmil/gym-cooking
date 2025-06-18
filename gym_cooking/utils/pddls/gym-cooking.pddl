@@ -54,6 +54,7 @@
 (:action chop
     :parameters (?a - agent ?agent_loc - cell ?cut-board_loc - cell ?obj - object)
     :precondition (and
+        (not (plate ?obj)) ; cannot chop a plate
         (agent_at ?a ?agent_loc)
         (is_cutting_board ?cut-board_loc)
         (not (chopped ?obj)) ; cannot chop if already chopped
@@ -192,7 +193,10 @@
     (not (delivery_spot ?target_loc))
     (not (is_floor ?target_loc)) ; cannot put down on floor
     (adjacent ?agent_loc ?target_loc)
-  )
+    (or (not (is_cutting_board ?target_loc)) ; can put down on cutting board
+        (plate ?obj) ; can put down a plate
+        (chopped ?obj) ; can put down a chopped object
+    )
   :effect (and
     (not (holding ?a ?obj))
     (object_at ?obj ?target_loc)

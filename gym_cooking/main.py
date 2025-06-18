@@ -120,7 +120,7 @@ def main_loop(arglist):
     # game = GameVisualize(env)
     real_agents = initialize_agents(arglist=arglist, env=env)
     #super_agent = RLSuperAgent(num_agents=arglist.num_agents)
-
+    rl_flag = True
     # if there is an rl agent change env to rl wrapper
     if isinstance(real_agents[0], RLAgent):
         env = OvercookedRLWrapper(env)
@@ -131,7 +131,8 @@ def main_loop(arglist):
 
     info = {"t": 0}
 
-    while not env.done():
+    while (not env.done()) and rl_flag:
+
         action_dict = {}
         # observations = []
         # predictions = []
@@ -168,7 +169,10 @@ def main_loop(arglist):
                     agent.refresh_subtasks(world=env.world)
         elif isinstance(real_agents[0], RLAgent):
             #callback = RecordTrajectories()
-            real_agents[0].model.learn(total_timesteps=100000)  # add callback
+            # open trajectory file with current time stamp and level name
+
+            real_agents[0].model.learn(total_timesteps=arglist.max_num_timesteps)  # add callback
+            rl_flag = False
             real_agents[0].model.save("centralized_ppo_model")
 
         # Saving info
