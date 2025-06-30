@@ -33,6 +33,7 @@ class RealAgent:
         self.name = name
         self.color = id_color
         self.recipes = recipes
+        self.steps_taken = 0  # Initialize steps_taken
 
         # Bayesian Delegation.
         self.reset_subtasks()
@@ -94,6 +95,7 @@ class RealAgent:
         self.new_subtask, self.new_subtask_agent_names = self.delegator.select_subtask(
                 agent_name=self.name)
         self.plan(copy.copy(obs))
+        self.steps_taken += 1  # Increment steps_taken
         return self.action
 
     def get_subtasks(self, world):

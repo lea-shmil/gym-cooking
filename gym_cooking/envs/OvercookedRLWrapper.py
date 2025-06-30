@@ -60,36 +60,13 @@ class OvercookedRLWrapper(Wrapper):
         self.action_space = MultiDiscrete([5, 5])
         self.log_file = "env_log.txt"  # File to log states and actions
         self.vector = self._process_observation(self.env.get_repr(), self.env.world.get_object_list())
-        self.no_op = 0
+        self.last_action_dict = None
 
         # Clear the log file at the start
         with open(self.log_file, "w") as log:
             log.write("")
 
-        # create PDDL file based on the level name
-        # parse name_of_level from arglist.level
-        name_of_level = self.arglist.level.split('/')[-1]  # Extract the level name from the path
 
-        # check if pddl file exists in utils/levels as name_of_level.pddl
-        pddl_file_path = f"utils/pddls/{name_of_level}.pddl"
-        if not os.path.exists(pddl_file_path):
-            print(f"PDDL file for {name_of_level} does not exist. Creating a new one.")
-            with open(pddl_file_path, 'w') as pddl_file:
-                pddl_file.write(f"; PDDL file for {name_of_level}\n")
-                self.state_to_pddl(self.vector, name_of_level, self.env.world.width, self.env.world.height,
-                                   pddl_file_path)
-        else:
-            print(f"PDDL file for {name_of_level} already exists.")
-
-        # Create a filename for the trajectory file
-        # Ensure the directory exists
-        trajectory_dir = 'misc/metrics/trajectories/'
-        os.makedirs(trajectory_dir, exist_ok=True)
-
-        # Open the file for writing
-        with open(f'{trajectory_dir}{self.filename}.trajectory', 'w') as f:
-            f.write('(  (:init')  # Initialize the file
-            get_state(f, self.vector, self.env.world.width, self.env.world.height)
 
     def reset(self):
         # Call the original environment's reset method
@@ -104,6 +81,7 @@ class OvercookedRLWrapper(Wrapper):
         action_dict["agent-1"] = action_mapping[action_arr[0]]
         action_dict["agent-2"] = action_mapping[action_arr[1]]
 
+        self.last_action_dict = action_dict
         with open(self.log_file, "a") as log:
             log.write("State:\n")
             log.write(np.array2string(self.vector) + "\n")  # Write the state as a raw array
@@ -112,17 +90,7 @@ class OvercookedRLWrapper(Wrapper):
             log.write("Actions:\n")
             log.write(json.dumps(action_dict) + "\n")
 
-        with open(f'misc/metrics/trajectories/{self.filename}.trajectory', 'a') as f:
-            if self.no_op < 2:
-                f.write('(operators: ')
-                f.flush()
-            self.get_parameters(f, action_dict, self.env.world.width, self.env.world.height)
-            f.flush()
-            if self.no_op < 2:
-                f.flush()
-                f.write(')\n')  # Close the operators list
-                f.write('(:state ')
-                get_state(f, self.vector, self.env.world.width, self.env.world.height)
+
 
         obs, reward, done, info = self.env.step(action_dict)
         if 'obs' in info:
@@ -152,7 +120,7 @@ class OvercookedRLWrapper(Wrapper):
             vector[index] = world_object_map.get(obj.name, -1)  # Use the mapping to encode the object type
 
         # Step 2: Encode only agents
-        offset = grid_size - 1
+        offset = grid_size
         for obj_group in obs_repr:
             if isinstance(obj_group, AgentRepr):
                 x, y = obj_group.location
@@ -168,7 +136,6 @@ class OvercookedRLWrapper(Wrapper):
         # Step 3: Encode moving objects
         for obj in moving_objects:
             x, y = obj.location
-            name = world_object_map.get(obj.name, -1)
             if obj.name == 'Tomato':
                 vector[offset] = 1
                 vector[offset + 1] = 1
@@ -178,6 +145,7 @@ class OvercookedRLWrapper(Wrapper):
             elif obj.name == 'Plate' and not plate_flag:
                 vector[offset] = 3
                 vector[offset + 3] = 1
+                plate_flag = True
             else:  # second plate
                 vector[offset] = 4
                 vector[offset + 3] = 2
@@ -196,6 +164,7 @@ class OvercookedRLWrapper(Wrapper):
             world_height: Height of the grid world.
             pddl_file_path: Path to save the generated PDDL file.
         """
+
         with open(pddl_file_path, 'w') as pddl_file:
             # Write PDDL header
             pddl_file.write("; PDDL file for " + name_of_level + "\n")
@@ -223,92 +192,31 @@ class OvercookedRLWrapper(Wrapper):
             # Define goal
             pddl_file.write("(:goal\n")
             if "tomato" in name_of_level:
-                pddl_file.write("   (or\n")
-                pddl_file.write("        (and (delivered t1)\n")
-                pddl_file.write("             (tomato t1)\n")
-                pddl_file.write("             (plate t1)\n")
-                pddl_file.write("             (chopped t1))\n")
-                pddl_file.write("        (and (delivered p1)\n")
-                pddl_file.write("             (tomato p1)\n")
-                pddl_file.write("             (plate p1)\n")
-                pddl_file.write("             (chopped p1))\n")
-                pddl_file.write("        (and (delivered p2)\n")
-                pddl_file.write("             (tomato p2)\n")
-                pddl_file.write("             (plate p2)\n")
-                pddl_file.write("             (chopped p2))\n")
+                pddl_file.write("   (and (delivered t1)\n")
+                pddl_file.write("       (tomato t1)\n")
             elif "salad" in name_of_level:
-                pddl_file.write("   (or\n")
-                pddl_file.write("        (and (delivered t1)\n")
-                pddl_file.write("             (tomato t1)\n")
-                pddl_file.write("             (plate t1)\n")
-                pddl_file.write("             (chopped t1)\n")
-                pddl_file.write("             (lettuce t1))\n")
-                pddl_file.write("        (and (delivered p1)\n")
-                pddl_file.write("             (tomato p1)\n")
-                pddl_file.write("             (plate p1)\n")
-                pddl_file.write("             (chopped p1)\n")
-                pddl_file.write("             (lettuce p1))\n")
-                pddl_file.write("        (and (delivered p2)\n")
-                pddl_file.write("             (tomato p2)\n")
-                pddl_file.write("             (plate p2)\n")
-                pddl_file.write("             (chopped p2)\n")
-                pddl_file.write("             (lettuce p2))\n")
-                pddl_file.write("        (and (delivered l1)\n")
-                pddl_file.write("             (lettuce l1)\n")
-                pddl_file.write("             (tomato l1)\n")
-                pddl_file.write("             (plate l1)\n")
-                pddl_file.write("             (chopped l1))\n")
+                pddl_file.write("   ;(or\n")
+                pddl_file.write("       (and (delivered t1)\n")
+                pddl_file.write("           (tomato t1)\n")
+                pddl_file.write("           (lettuce t1)\n")
+                pddl_file.write("       ;(and (delivered l1)\n")
+                pddl_file.write("           ;(lettuce l1)\n")
+                pddl_file.write("           ;(tomato l1))\n")
             elif "tl" in name_of_level:
-                pddl_file.write("        (and \n")
-                pddl_file.write("             (or \n")
-                pddl_file.write("                 (and \n")
-                pddl_file.write("                     (delivered t1)\n")
-                pddl_file.write("                     (tomato t1)\n")
-                pddl_file.write("                     (plate t1)\n")
-                pddl_file.write("                     (chopped t1)\n")
-                pddl_file.write("                 )\n")
-                pddl_file.write("                 (and \n")
-                pddl_file.write("                     (delivered p1)\n")
-                pddl_file.write("                     (tomato p1)\n")
-                pddl_file.write("                     (plate p1)\n")
-                pddl_file.write("                     (chopped p1)\n")
-                pddl_file.write("                 )\n")
-                pddl_file.write("                 (and \n")
-                pddl_file.write("                     (delivered p2)\n")
-                pddl_file.write("                     (tomato p2)\n")
-                pddl_file.write("                     (plate p2)\n")
-                pddl_file.write("                     (chopped p2)\n")
-                pddl_file.write("                 )\n")
-                pddl_file.write("             )\n")
-                pddl_file.write("             (or \n")
-                pddl_file.write("                 (and \n")
-                pddl_file.write("                     (delivered p1)\n")
-                pddl_file.write("                     (lettuce p1)\n")
-                pddl_file.write("                     (plate p1)\n")
-                pddl_file.write("                     (chopped p1)\n")
-                pddl_file.write("                 )\n")
-                pddl_file.write("                 (and \n")
-                pddl_file.write("                     (delivered p2)\n")
-                pddl_file.write("                     (lettuce p2)\n")
-                pddl_file.write("                     (plate p2)\n")
-                pddl_file.write("                     (chopped p2)\n")
-                pddl_file.write("                 )\n")
-                pddl_file.write("                 (and \n")
-                pddl_file.write("                     (delivered l1)\n")
-                pddl_file.write("                     (lettuce l1)\n")
-                pddl_file.write("                     (plate l1)\n")
-                pddl_file.write("                     (chopped l1)\n")
-                pddl_file.write("                 )\n")
-                pddl_file.write("             )\n")
+                pddl_file.write("   (and \n")
+                pddl_file.write("       (delivered t1)\n")
+                pddl_file.write("       (tomato t1)\n")
+                pddl_file.write("       (delivered l1)\n")
+                pddl_file.write("       (lettuce l1)\n")
             pddl_file.write("   )\n")  # first or/and
             pddl_file.write(")\n")  # goal
             pddl_file.write(")\n")  # end of define
 
     def get_parameters(self, f, action_dict, width, height):
-        no_op = 0
-        offset = width * height - 1
+        offset = width * height
         object_offset = offset + AGENT_PROPERTIES * len(action_dict)  # Start after the grid and agent properties
         agent_keys = ["agent-1", "agent-2"]
+        actions = []
 
         for a, agent_key in enumerate(agent_keys):
             x_start = self.vector[offset]
@@ -337,8 +245,7 @@ class OvercookedRLWrapper(Wrapper):
             if dest_tile == "floor" and x_end != self.vector[offset + 3 - a * 6] and y_end != self.vector[
                 offset + 3 + 1 - a * 6]:
                 action = "move"
-                f.write(f"    ({action} a{a + 1} {start_loc} {end_loc})\n")
-                f.flush()
+                actions.append(f"({action} a{a + 1} {start_loc} {end_loc})")
                 self.vector[offset] = x_end
                 self.vector[offset + 1] = y_end
                 if object_held != -1:  # If the agent is holding an object, update its position
@@ -386,16 +293,13 @@ class OvercookedRLWrapper(Wrapper):
                                                    self.vector[object_dest - 3])  # lettuce
                 self.vector[object_held - 4] = max(self.vector[object_held - 4], self.vector[object_dest - 4])  # tomato
             else:
-                no_op += 1
-                self.no_op = no_op
-                offset += 3
+                actions.append(f"(nop )")
                 continue
 
             if dest_tile != "floor":
-                f.write(f"    ({action} a{a + 1} {start_loc} {end_loc} {item})\n")
-                f.flush()
+                actions.append(f"({action} a{a + 1} {start_loc} {end_loc} {item})")
             offset += 3
-        self.no_op = no_op
+        f.write(" ".join(actions) + ")\n")  # Close the operators section
 
 
 def get_state(pddl_file, state, world_width, world_height):
@@ -403,51 +307,47 @@ def get_state(pddl_file, state, world_width, world_height):
     grid_size = world_width * world_height
 
     # add agents
-    offset = grid_size - 1
+    offset = grid_size
     agent_locs = {}
     for i in range(2):  # Assuming 2 agents
         x, y, num = state[offset], state[offset + 1], state[offset + 2]
-        pddl_file.write(f"    (agent_at a{num} x{x}y{y})\n")
-        pddl_file.write(f"    (holding_nothing a{num})\n")
-        pddl_file.write(f"    (occupied x{x}y{y})\n")
+        pddl_file.write(f" (agent_at a{num} x{x}y{y})")
+        pddl_file.write(f" (holding_nothing a{num})")
+        pddl_file.write(f" (occupied x{x}y{y})")
         offset += 3
         agent_locs[f'a{num}'] = (x, y)  # Store agent locations for later use
     #
-    flag_p = True
+
     for i in range(grid_size):
         x, y = divmod(i, world_width)
         if state[i] == world_object_map['Floor']:
-            pddl_file.write(f"    (is_floor x{x}y{y})\n")
-            # not occupied if agents are not on the floor
-            if not any(agent_loc == (x, y) for agent_loc in agent_locs.values()):
-                pddl_file.write(f"    (not (occupied x{x}y{y}))\n")
+            pddl_file.write(f" (is_floor x{x}y{y})")
         elif state[i] == world_object_map['Cutboard']:
-            pddl_file.write(f"    (is_cutting_board x{x}y{y})\n")
+            pddl_file.write(f" (is_cutting_board x{x}y{y})")
         elif state[i] == world_object_map['Delivery']:
-            pddl_file.write(f"    (delivery_spot x{x}y{y})\n")
-        elif state[i] > world_object_map['Delivery']:
-            # go over map find key that matches the value of state[i]
-            for key, value in world_object_map.items():
-                if value == state[i]:
-                    if key.lower() == 'plate' and flag_p:
-                        # If it's a plate, we need to add the second plate assuming there are two plates
-                        pddl_file.write(f"    (object_at {key.lower()[0]}{2} x{x}y{y})\n")
-                        pddl_file.write(f"    (occupied x{x}y{y})\n")
-                        pddl_file.write(f"    ({key.lower()} {key.lower()[0]}{2})\n")
-                        flag_p = False
-                        continue
-                    pddl_file.write(f"    (object_at {key.lower()[0]}{1} x{x}y{y})\n")
-                    pddl_file.write(f"    (occupied x{x}y{y})\n")
-                    pddl_file.write(f"    ({key.lower()} {key.lower()[0]}{1})\n")
+            pddl_file.write(f" (delivery_spot x{x}y{y})")
+
+    for i in range(grid_size + AGENT_PROPERTIES*2, len(state), OBJECT_PROPERTIES):
+        x, y = state[i + 5], state[i + 6]
+        # go over map find key that matches the value of state[i]
+        pddl_file.write(f" (object_at {pddl_name[state[i]]} x{x}y{y})")
+        pddl_file.write(f" (occupied x{x}y{y})")
+        word = tile_type.get(state[i]+6, 'plate')
+        if word != 'plate':
+            pddl_file.write(f" (not-plate {pddl_name[state[i]]})")
+
+        # tomato t1
+        pddl_file.write(f" ({word} {pddl_name[state[i]]})")
+
 
     # adjacency predicates
     for x in range(world_width):
         for y in range(world_height):
             if x + 1 < world_width:
-                pddl_file.write(f"    (adjacent x{x}y{y} x{x + 1}y{y})\n")
-                pddl_file.write(f"    (adjacent x{x + 1}y{y} x{x}y{y})\n")
+                pddl_file.write(f" (adjacent x{x}y{y} x{x + 1}y{y})")
+                pddl_file.write(f" (adjacent x{x + 1}y{y} x{x}y{y})")
             if y + 1 < world_height:
-                pddl_file.write(f"    (adjacent x{x}y{y} x{x}y{y + 1})\n")
-                pddl_file.write(f"    (adjacent x{x}y{y + 1} x{x}y{y})\n")
+                pddl_file.write(f" (adjacent x{x}y{y} x{x}y{y + 1})")
+                pddl_file.write(f" (adjacent x{x}y{y + 1} x{x}y{y})")
 
-    pddl_file.write(")\n\n")
+    pddl_file.write(")\n")

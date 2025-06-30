@@ -16,11 +16,15 @@ if __name__ == "__main__":
     for path in custom_paths:
         if path not in os.environ["PATH"]:
             os.environ["PATH"] = path + os.pathsep + os.environ["PATH"]
+    print("Received arguments:", sys.argv)
 
-    problem_file = r'C:\Users\Administrator\Documents\GitHub\gym-cooking\gym_cooking\utils\pddls\open-divider_tl.pddl'
-    domain_file = r'C:\Users\Administrator\Documents\GitHub\gym-cooking\gym_cooking\utils\pddls\gym-cooking.pddl'
-    evaluator = 'hcea=cea()'
-    search = 'lazy_greedy([hcea], preferred=[hcea])'
+    domain_file = sys.argv[1]
+    problem_file = sys.argv[2]
+    evaluator = sys.argv[3]  # Pass evaluator dynamically
+    search = sys.argv[4]     # Pass search strategy dynamically
+
+    # Measure time to generate the plan
+
     sys.argv = [
         'fast-downward.py',
         domain_file,
@@ -28,6 +32,5 @@ if __name__ == "__main__":
         '--evaluator', evaluator,
         '--search', search
     ]
-
-main()
+    main()
 

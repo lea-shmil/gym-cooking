@@ -1,5 +1,7 @@
 # from environment import OvercookedEnvironment
 # from gym_cooking.envs import OvercookedEnvironment
+import os
+
 from gym_cooking.envs.OvercookedRLWrapper import OvercookedRLWrapper
 from gym_cooking.utils.plan_agent import plan_agent
 from recipe_planner.recipe import *
@@ -17,10 +19,34 @@ from collections import namedtuple
 
 #from utils.logger import RecordTrajectories
 import gym
+import time
+import logging
 
+def setup_logger(log_file):
+    """Set up a logger to log to both console and file."""
+    logger = logging.getLogger("ExperimentLogger")
+    logger.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(asctime)s - %(message)s')
+
+    # File handler
+    file_handler = logging.FileHandler(log_file)
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+
+    # Console handler
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(formatter)
+    logger.addHandler(console_handler)
+
+    return logger
 
 def parse_arguments():
     parser = argparse.ArgumentParser("Overcooked 2 argument parser")
+
+    #planning agents
+    parser.add_argument("--evaluator", type=str, default="hcea=cea()", help="Evaluator for the planner")
+    parser.add_argument("--search", type=str, default="lazy_greedy([hcea], preferred=[hcea])", help="Search strategy for the planner")
+
 
     # Environment
     parser.add_argument("--level", type=str, required=True)
@@ -58,10 +84,9 @@ def fix_seed(seed):
     np.random.seed(seed)
     random.seed(seed)
 
-def initialize_agents(arglist, env):
+
+def initialize_agents(arglist, env, logger):
     real_agents = []
-
-
 
     with open('utils/levels/{}.txt'.format(arglist.level), 'r') as f:
         phase = 1
@@ -96,7 +121,10 @@ def initialize_agents(arglist, env):
                             id_color=COLORS[len(real_agents)],
                             recipes=recipes,
                             arglist=arglist,
-                            env=env
+                            env=env,
+                            logger=logger,  # Pass the logger instance
+                            evaluator=arglist.evaluator,
+                            search=arglist.search
                         )
                     else:
                         # Default to RealAgent
@@ -113,13 +141,25 @@ def initialize_agents(arglist, env):
 def main_loop(arglist):
     """The main loop for running experiments."""
     print("Initializing environment and agents.")
-    #might have to change arglist for environment because the make wont work for my new agent
+
+    log_file = "experiment_log.txt"
+    logger = setup_logger(log_file)
+
+    logger.info(f"Running: python main.py --num-agents {arglist.num_agents} --seed {arglist.seed} "
+                f"--level {arglist.level} --model1 {arglist.model1} --model2 {arglist.model2} "
+                f"--search {arglist.search} --evaluator {arglist.evaluator} ")
+
+
     env = gym.envs.make("gym_cooking:overcookedEnv-v0", arglist=arglist)
     obs = env.reset()
 
     # game = GameVisualize(env)
-    real_agents = initialize_agents(arglist=arglist, env=env)
-    #super_agent = RLSuperAgent(num_agents=arglist.num_agents)
+    real_agents = initialize_agents(arglist=arglist, env=env, logger=logger)
+    #super_agent = RLSuperAgent(num_agents=
+
+    # Start timing the agent's execution
+    agent_start_time = time.time()
+
     rl_flag = True
     # if there is an rl agent change env to rl wrapper
     if isinstance(real_agents[0], RLAgent):
@@ -171,13 +211,35 @@ def main_loop(arglist):
             #callback = RecordTrajectories()
             # open trajectory file with current time stamp and level name
 
-            real_agents[0].model.learn(total_timesteps=arglist.max_num_timesteps)  # add callback
+            real_agents[0].train(total_timesteps=arglist.max_num_timesteps)
             rl_flag = False
-            real_agents[0].model.save("centralized_ppo_model")
+
 
         # Saving info
         if isinstance(real_agents[0], RealAgent):
             bag.add_status(cur_time=info['t'], real_agents=real_agents)
+
+    # End timing and calculate elapsed time
+    agent_end_time = time.time()
+    elapsed_time = agent_end_time - agent_start_time
+
+    # Log metrics
+    for agent in real_agents:
+        logger.info(f"Agent {agent.name}: Steps taken: {agent.steps_taken}")
+    #logger.info(f"Total steps taken: {sum(agent.steps_taken for agent in real_agents)}")
+    logger.info(f"Time taken for {arglist.level} with {arglist.model1} and {arglist.model2}: {elapsed_time:.2f} seconds")
+
+    # Log overall success
+    logger.info(f"Experiment success: {env.successful}")
+
+    # Delete the plan file after the run is complete
+    if isinstance(real_agents[0], plan_agent):
+        try:
+            if os.path.exists(real_agents[0].plan_file_path):
+                os.remove(real_agents[0].plan_file_path)
+                logger.info(f"Deleted plan file: {real_agents[0].plan_file_path}")
+        except Exception as e:
+            logger.error(f"Failed to delete plan file: {e}")
 
     # Saving final information before saving pkl file
     if not isinstance(real_agents[0], RLAgent):

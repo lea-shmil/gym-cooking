@@ -1,6 +1,11 @@
 #import numpy as np
 from stable_baselines3 import PPO
 #from stable_baselines3.common.vec_env import DummyVecEnv
+import time
+import os
+
+from gym_cooking.utils.CustomCallback import TrajectoryCallback
+
 
 class RLAgent:
     def __init__(self, name, id_color, recipes, arglist, env):
@@ -8,8 +13,10 @@ class RLAgent:
         self.color = id_color
         self.recipes = recipes
         self.arglist = arglist
-        #self.vec_env = DummyVecEnv([lambda: env])
+        self.env = env
+        #, n_steps=100, batch_size=20
         self.model = PPO("MlpPolicy", env, verbose=1)
+        self.steps_taken = 0
 
         # # Define the mapping from discrete actions to navigation actions
         # #written in utils.py
@@ -32,15 +39,21 @@ class RLAgent:
     #     navigation_action = self.action_mapping.get(action_index, (0, 0))  # Default to no-op if invalid index
     #
     #     return navigation_action
-    #
-    # def train(self, total_timesteps=10000):
-    #     """
-    #     Train the RL agent using PPO.
-    #     """
-    #     # Use the environment to collect training data
-    #
-    #     self.model.learn(total_timesteps=total_timesteps)
-    #     self.model.save(f"{self.name}_ppo_model")  # Save the model after training
+
+    def train(self, total_timesteps=10000):
+        """
+        Train the RL agent using PPO.
+        """
+        callback = TrajectoryCallback(self.env, total_timesteps,  trajectory_dir="misc/metrics/trajectories")
+        self.model.learn(total_timesteps=total_timesteps, callback=callback)
+        self.steps_taken += total_timesteps  # Increment steps counter
+
+        # Save the model with a timestamp
+        timestamp = time.strftime("%Y%m%d-%H%M%S")
+        save_dir = "rl_zips"
+        model_path = os.path.join(save_dir, f"{self.name}_ppo_model_{timestamp}.zip")
+        self.model.save(model_path)
+        print(f"Model saved to {model_path}")
 
 
 #TODO implement reward learning logic

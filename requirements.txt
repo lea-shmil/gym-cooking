@@ -12,3 +12,5 @@ termcolor~=1.1.0
 gymnasium~=1.0.0
 requests~=2.32.3
 scipy~=1.5.2
+pddl-plus-parser==3.14.7
+anytree~=2.8.0
