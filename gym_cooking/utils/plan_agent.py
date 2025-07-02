@@ -1,9 +1,13 @@
 import os
+import re
 import subprocess
 import time
 from pddl_plus_parser.multi_agent import PlanConverter
 from pddl_plus_parser.lisp_parsers import DomainParser, ProblemParser
 import logging
+
+from gym_cooking.utils.plans.transfer_single import parallel_execution
+
 logging.root.setLevel(logging.ERROR)
 
 
@@ -58,23 +62,35 @@ class plan_agent:
             ]
 
             result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-            print(result)
-            # End timing and calculate elapsed time
-
+            #print(result)
 
             # Construct path to the sas_plan file inside gym_cooking directory
             base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))  # gym_cooking/utils -> gym_cooking C:\Users\Administrator\Documents\GitHub\gym-cooking\gym_cooking\sas_plan
             sas_plan_path = os.path.join(base_dir, "sas_plan")
 
+            #remove last line from sas_plan file
+            with open(sas_plan_path, "r") as file:
+                lines = file.readlines()
+            # Remove the last line
+            lines = lines[:-1]
+            with open(sas_plan_path, "w") as file:
+                file.writelines(lines)
+
+            result = parallel_execution(domain_file, problem_file, sas_plan_path, ["a1", "a2"])
+
+
+
             if os.path.exists(sas_plan_path):
                 with open(sas_plan_path, "r") as f_in, open(self.plan_file_path, "w") as f_out:
-                   # f_out.write("(define\n")
-                    f_out.write(f_in.read())
-                    #f_out.write(")\n")
-                # Use the parallel_execution function to transform the plan
-                # agent_names = ['a1', 'a2']  # List of agent names
-                #
-                # joint_actions = self.parallel_execution(domain_file, self.plan_file_path, agent_names)
+
+                    for joint_action in result:
+                        # joint_action.actions is a list of ActionCall objects
+                        for action_call in joint_action.actions:
+                            if action_call.name.strip().lower() != "nop":
+                                # Build a readable string of the action (e.g., "move a2 x1y1 x1y2")
+                                action_str = f"{action_call.name} {' '.join(action_call.parameters)}"
+                                f_out.write(f"({action_str})\n")
+
                 end_time = time.perf_counter()
                 elapsed_time = end_time - start_time
                 # Log the planning time

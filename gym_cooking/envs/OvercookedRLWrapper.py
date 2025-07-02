@@ -61,6 +61,8 @@ class OvercookedRLWrapper(Wrapper):
         self.log_file = "env_log.txt"  # File to log states and actions
         self.vector = self._process_observation(self.env.get_repr(), self.env.world.get_object_list())
         self.last_action_dict = None
+        self.success = False
+        self.steps_to_success = 0
 
         # Clear the log file at the start
         with open(self.log_file, "w") as log:
@@ -70,7 +72,9 @@ class OvercookedRLWrapper(Wrapper):
 
     def reset(self):
         # Call the original environment's reset method
+        steps = self.steps_to_success
         obs = self.env.reset()
+        self.steps_to_success = steps
         self.vector = self._process_observation(self.env.get_repr(), self.env.world.get_object_list())
         return self.vector
 
@@ -90,11 +94,18 @@ class OvercookedRLWrapper(Wrapper):
             log.write("Actions:\n")
             log.write(json.dumps(action_dict) + "\n")
 
-
+        steps = self.env.t
 
         obs, reward, done, info = self.env.step(action_dict)
         if 'obs' in info:
             del info['obs']
+
+        if not self.success:
+            self.success = self.env.successful
+
+        if self.steps_to_success == 0 and self.success:
+            self.steps_to_success = steps
+            print("steps to success:", self.steps_to_success)
 
         return self.vector, reward, done, info
 

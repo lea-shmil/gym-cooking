@@ -5,9 +5,9 @@ source /c/Users/Administrator/anaconda3/etc/profile.d/conda.sh
 conda activate gym_cooking
 
 levels=("full-divider_salad" "partial-divider_salad" "open-divider_salad" "full-divider_tomato" "partial-divider_tomato" "open-divider_tomato" "full-divider_tl" "partial-divider_tl" "open-divider_tl")
-#levels=("open-divider_salad")
-models=("rl" "plan" "plan" "bd")
-#models=("bd" "plan" "plan")
+#levels=("open-divider_tomato")
+#models=("rl" "plan" "plan" "bd")
+models=("plan" "plan")
 
 nagents=2
 nseed=1
@@ -47,7 +47,7 @@ for level in "${levels[@]}"; do
       fi
       # Set max-num-timesteps based on the model
       if [[ "$model" == "rl" ]]; then
-        max_timesteps="--max-num-timesteps 10000"
+        max_timesteps="--max-num-timesteps 30000"
       else
         max_timesteps="--max-num-timesteps 100"
       fi

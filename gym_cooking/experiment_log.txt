@@ -1,217 +1,120 @@
-attempt 1:
-2025-06-29 12:12:32,535 - Running: python main.py --num-agents 2 --seed 1 --level full-divider_salad --model1 rl --model2 rl --search  --evaluator  
-2025-06-29 12:13:28,147 - Agent agent-1: Steps taken: 10000
-2025-06-29 12:13:28,148 - Agent agent-2: Steps taken: 0
-2025-06-29 12:13:28,148 - Time taken for full-divider_salad with rl and rl: 54.94 seconds
-2025-06-29 12:13:28,148 - Experiment success: False
-2025-06-29 12:13:37,258 - Running: python main.py --num-agents 2 --seed 1 --level full-divider_salad --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
-2025-06-29 12:13:38,176 - Planning completed for full-divider_salad in 0.57103940 seconds
-2025-06-29 12:13:38,319 - Agent agent-1: Steps taken: 55
-2025-06-29 12:13:38,319 - Agent agent-2: Steps taken: 55
-2025-06-29 12:13:38,319 - Time taken for full-divider_salad with plan and plan: 0.14 seconds
-2025-06-29 12:13:38,319 - Experiment success: True
-2025-06-29 12:13:38,319 - Deleted plan file: utils/plans/full-divider_salad_plan.txt
-2025-06-29 12:13:47,057 - Running: python main.py --num-agents 2 --seed 1 --level full-divider_salad --model1 plan --model2 plan --search astar(lmcut, bound=infinity, max_time=infinity, description="astar", verbosity=normal) --evaluator lmcut=lmcut(transform=adapt_costs(cost_type=one)) 
-2025-06-29 12:16:06,476 - Planning completed for full-divider_salad in 139.05178230 seconds
-2025-06-29 12:16:06,559 - Agent agent-1: Steps taken: 33
-2025-06-29 12:16:06,559 - Agent agent-2: Steps taken: 33
-2025-06-29 12:16:06,560 - Time taken for full-divider_salad with plan and plan: 0.08 seconds
-2025-06-29 12:16:06,560 - Experiment success: True
-2025-06-29 12:16:06,560 - Deleted plan file: utils/plans/full-divider_salad_plan.txt
-2025-06-29 12:16:15,292 - Running: python main.py --num-agents 2 --seed 1 --level full-divider_salad --model1 bd --model2 bd --search  --evaluator  
-2025-06-29 12:25:18,015 - Agent agent-1: Steps taken: 27
-2025-06-29 12:25:18,015 - Agent agent-2: Steps taken: 27
-2025-06-29 12:25:18,015 - Time taken for full-divider_salad with bd and bd: 542.48 seconds
-2025-06-29 12:25:18,015 - Experiment success: True
-2025-06-29 12:25:40,931 - Running: python main.py --num-agents 2 --seed 1 --level partial-divider_salad --model1 rl --model2 rl --search  --evaluator  
-2025-06-29 12:26:38,958 - Agent agent-1: Steps taken: 10000
-2025-06-29 12:26:38,958 - Agent agent-2: Steps taken: 0
-2025-06-29 12:26:38,958 - Time taken for partial-divider_salad with rl and rl: 57.26 seconds
-2025-06-29 12:26:38,958 - Experiment success: False
-2025-06-29 12:26:48,309 - Running: python main.py --num-agents 2 --seed 1 --level partial-divider_salad --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
-2025-06-29 12:26:49,581 - Planning completed for partial-divider_salad in 0.92477500 seconds
-2025-06-29 12:26:49,693 - Agent agent-1: Steps taken: 40
-2025-06-29 12:26:49,693 - Agent agent-2: Steps taken: 40
-2025-06-29 12:26:49,693 - Time taken for partial-divider_salad with plan and plan: 0.10 seconds
-2025-06-29 12:26:49,693 - Experiment success: True
-2025-06-29 12:26:49,694 - Deleted plan file: utils/plans/partial-divider_salad_plan.txt
-2025-06-29 12:26:58,684 - Running: python main.py --num-agents 2 --seed 1 --level partial-divider_salad --model1 plan --model2 plan --search astar(lmcut, bound=infinity, max_time=infinity, description="astar", verbosity=normal) --evaluator lmcut=lmcut(transform=adapt_costs(cost_type=one)) 
-2025-06-29 12:32:57,113 - Planning completed for partial-divider_salad in 358.12610790 seconds
-2025-06-29 12:32:57,203 - Agent agent-1: Steps taken: 33
-2025-06-29 12:32:57,203 - Agent agent-2: Steps taken: 33
-2025-06-29 12:32:57,203 - Time taken for partial-divider_salad with plan and plan: 0.08 seconds
-2025-06-29 12:32:57,203 - Experiment success: True
-2025-06-29 12:32:57,204 - Deleted plan file: utils/plans/partial-divider_salad_plan.txt
-2025-06-29 12:33:06,443 - Running: python main.py --num-agents 2 --seed 1 --level partial-divider_salad --model1 bd --model2 bd --search  --evaluator  
-2025-06-29 13:02:03,725 - Agent agent-1: Steps taken: 31
-2025-06-29 13:02:03,725 - Agent agent-2: Steps taken: 31
-2025-06-29 13:02:03,726 - Time taken for partial-divider_salad with bd and bd: 1736.95 seconds
-2025-06-29 13:02:03,726 - Experiment success: True
-2025-06-29 13:02:45,265 - Running: python main.py --num-agents 2 --seed 1 --level open-divider_salad --model1 rl --model2 rl --search  --evaluator  
-2025-06-29 13:03:40,119 - Agent agent-1: Steps taken: 10000
-2025-06-29 13:03:40,119 - Agent agent-2: Steps taken: 0
-2025-06-29 13:03:40,119 - Time taken for open-divider_salad with rl and rl: 54.23 seconds
-2025-06-29 13:03:40,119 - Experiment success: False
-2025-06-29 13:03:49,253 - Running: python main.py --num-agents 2 --seed 1 --level open-divider_salad --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
-2025-06-29 13:03:50,471 - Planning completed for open-divider_salad in 0.95844280 seconds
-2025-06-29 13:03:50,585 - Agent agent-1: Steps taken: 44
-2025-06-29 13:03:50,585 - Agent agent-2: Steps taken: 44
-2025-06-29 13:03:50,585 - Time taken for open-divider_salad with plan and plan: 0.11 seconds
-2025-06-29 13:03:50,585 - Experiment success: True
-2025-06-29 13:03:50,586 - Deleted plan file: utils/plans/open-divider_salad_plan.txt
-2025-06-29 13:03:59,264 - Running: python main.py --num-agents 2 --seed 1 --level open-divider_salad --model1 plan --model2 plan --search astar(lmcut, bound=infinity, max_time=infinity, description="astar", verbosity=normal) --evaluator lmcut=lmcut(transform=adapt_costs(cost_type=one)) 
-2025-06-29 13:28:35,614 - Planning completed for open-divider_salad in 1476.10637080 seconds
-2025-06-29 13:28:35,703 - Agent agent-1: Steps taken: 36
-2025-06-29 13:28:35,703 - Agent agent-2: Steps taken: 36
-2025-06-29 13:28:35,704 - Time taken for open-divider_salad with plan and plan: 0.09 seconds
-2025-06-29 13:28:35,704 - Experiment success: True
-2025-06-29 13:28:35,704 - Deleted plan file: utils/plans/open-divider_salad_plan.txt
-2025-06-29 13:28:44,395 - Running: python main.py --num-agents 2 --seed 1 --level open-divider_salad --model1 bd --model2 bd --search  --evaluator  
-2025-06-29 14:26:55,916 - Agent agent-1: Steps taken: 28
-2025-06-29 14:26:55,919 - Agent agent-2: Steps taken: 28
-2025-06-29 14:26:55,919 - Time taken for open-divider_salad with bd and bd: 3491.28 seconds
-2025-06-29 14:26:55,920 - Experiment success: True
-2025-06-29 14:28:03,456 - Running: python main.py --num-agents 2 --seed 1 --level full-divider_tomato --model1 rl --model2 rl --search  --evaluator  
-2025-06-29 14:29:02,201 - Agent agent-1: Steps taken: 10000
-2025-06-29 14:29:02,201 - Agent agent-2: Steps taken: 0
-2025-06-29 14:29:02,201 - Time taken for full-divider_tomato with rl and rl: 58.13 seconds
-2025-06-29 14:29:02,201 - Experiment success: False
-2025-06-29 14:29:11,734 - Running: python main.py --num-agents 2 --seed 1 --level full-divider_tomato --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
-2025-06-29 14:29:12,586 - Planning completed for full-divider_tomato in 0.69020370 seconds
-2025-06-29 14:29:12,650 - Agent agent-1: Steps taken: 23
-2025-06-29 14:29:12,650 - Agent agent-2: Steps taken: 23
-2025-06-29 14:29:12,650 - Time taken for full-divider_tomato with plan and plan: 0.06 seconds
-2025-06-29 14:29:12,650 - Experiment success: True
-2025-06-29 14:29:12,650 - Deleted plan file: utils/plans/full-divider_tomato_plan.txt
-2025-06-29 14:29:21,523 - Running: python main.py --num-agents 2 --seed 1 --level full-divider_tomato --model1 plan --model2 plan --search astar(lmcut, bound=infinity, max_time=infinity, description="astar", verbosity=normal) --evaluator lmcut=lmcut(transform=adapt_costs(cost_type=one)) 
-2025-06-29 14:29:26,031 - Planning completed for full-divider_tomato in 4.35020180 seconds
-2025-06-29 14:29:26,095 - Agent agent-1: Steps taken: 23
-2025-06-29 14:29:26,095 - Agent agent-2: Steps taken: 23
-2025-06-29 14:29:26,095 - Time taken for full-divider_tomato with plan and plan: 0.06 seconds
-2025-06-29 14:29:26,095 - Experiment success: True
-2025-06-29 14:29:26,095 - Deleted plan file: utils/plans/full-divider_tomato_plan.txt
-2025-06-29 14:29:34,968 - Running: python main.py --num-agents 2 --seed 1 --level full-divider_tomato --model1 bd --model2 bd --search  --evaluator  
-2025-06-29 14:31:07,608 - Agent agent-1: Steps taken: 20
-2025-06-29 14:31:07,608 - Agent agent-2: Steps taken: 20
-2025-06-29 14:31:07,608 - Time taken for full-divider_tomato with bd and bd: 92.48 seconds
-2025-06-29 14:31:07,608 - Experiment success: True
-2025-06-29 14:31:20,347 - Running: python main.py --num-agents 2 --seed 1 --level partial-divider_tomato --model1 rl --model2 rl --search  --evaluator  
-2025-06-29 14:32:15,650 - Agent agent-1: Steps taken: 10000
-2025-06-29 14:32:15,650 - Agent agent-2: Steps taken: 0
-2025-06-29 14:32:15,650 - Time taken for partial-divider_tomato with rl and rl: 54.86 seconds
-2025-06-29 14:32:15,650 - Experiment success: False
-2025-06-29 14:32:24,800 - Running: python main.py --num-agents 2 --seed 1 --level partial-divider_tomato --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
-2025-06-29 14:32:25,771 - Planning completed for partial-divider_tomato in 0.83107940 seconds
-2025-06-29 14:32:25,832 - Agent agent-1: Steps taken: 23
-2025-06-29 14:32:25,832 - Agent agent-2: Steps taken: 23
-2025-06-29 14:32:25,833 - Time taken for partial-divider_tomato with plan and plan: 0.06 seconds
-2025-06-29 14:32:25,833 - Experiment success: True
-2025-06-29 14:32:25,833 - Deleted plan file: utils/plans/partial-divider_tomato_plan.txt
-2025-06-29 14:32:34,525 - Running: python main.py --num-agents 2 --seed 1 --level partial-divider_tomato --model1 plan --model2 plan --search astar(lmcut, bound=infinity, max_time=infinity, description="astar", verbosity=normal) --evaluator lmcut=lmcut(transform=adapt_costs(cost_type=one)) 
-2025-06-29 14:32:44,014 - Planning completed for partial-divider_tomato in 9.34956000 seconds
-2025-06-29 14:32:44,071 - Agent agent-1: Steps taken: 23
-2025-06-29 14:32:44,071 - Agent agent-2: Steps taken: 23
-2025-06-29 14:32:44,071 - Time taken for partial-divider_tomato with plan and plan: 0.05 seconds
-2025-06-29 14:32:44,071 - Experiment success: True
-2025-06-29 14:32:44,072 - Deleted plan file: utils/plans/partial-divider_tomato_plan.txt
-2025-06-29 14:32:53,084 - Running: python main.py --num-agents 2 --seed 1 --level partial-divider_tomato --model1 bd --model2 bd --search  --evaluator  
-2025-06-29 14:47:05,664 - Agent agent-1: Steps taken: 23
-2025-06-29 14:47:05,664 - Agent agent-2: Steps taken: 23
-2025-06-29 14:47:05,664 - Time taken for partial-divider_tomato with bd and bd: 852.44 seconds
-2025-06-29 14:47:05,664 - Experiment success: True
-2025-06-29 14:47:31,245 - Running: python main.py --num-agents 2 --seed 1 --level open-divider_tomato --model1 rl --model2 rl --search  --evaluator  
-2025-06-29 14:48:26,732 - Agent agent-1: Steps taken: 10000
-2025-06-29 14:48:26,732 - Agent agent-2: Steps taken: 0
-2025-06-29 14:48:26,732 - Time taken for open-divider_tomato with rl and rl: 55.06 seconds
-2025-06-29 14:48:26,732 - Experiment success: False
-2025-06-29 14:48:35,930 - Running: python main.py --num-agents 2 --seed 1 --level open-divider_tomato --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
-2025-06-29 14:48:36,913 - Planning completed for open-divider_tomato in 0.88067590 seconds
-2025-06-29 14:48:36,978 - Agent agent-1: Steps taken: 24
-2025-06-29 14:48:36,978 - Agent agent-2: Steps taken: 24
-2025-06-29 14:48:36,978 - Time taken for open-divider_tomato with plan and plan: 0.06 seconds
-2025-06-29 14:48:36,978 - Experiment success: True
-2025-06-29 14:48:36,978 - Deleted plan file: utils/plans/open-divider_tomato_plan.txt
-2025-06-29 14:48:45,761 - Running: python main.py --num-agents 2 --seed 1 --level open-divider_tomato --model1 plan --model2 plan --search astar(lmcut, bound=infinity, max_time=infinity, description="astar", verbosity=normal) --evaluator lmcut=lmcut(transform=adapt_costs(cost_type=one)) 
-2025-06-29 14:49:02,097 - Planning completed for open-divider_tomato in 16.23805530 seconds
-2025-06-29 14:49:02,160 - Agent agent-1: Steps taken: 23
-2025-06-29 14:49:02,160 - Agent agent-2: Steps taken: 23
-2025-06-29 14:49:02,160 - Time taken for open-divider_tomato with plan and plan: 0.06 seconds
-2025-06-29 14:49:02,160 - Experiment success: True
-2025-06-29 14:49:02,160 - Deleted plan file: utils/plans/open-divider_tomato_plan.txt
-2025-06-29 14:49:10,930 - Running: python main.py --num-agents 2 --seed 1 --level open-divider_tomato --model1 bd --model2 bd --search  --evaluator  
-2025-06-29 14:55:01,841 - Agent agent-1: Steps taken: 23
-2025-06-29 14:55:01,841 - Agent agent-2: Steps taken: 23
-2025-06-29 14:55:01,841 - Time taken for open-divider_tomato with bd and bd: 350.81 seconds
-2025-06-29 14:55:01,841 - Experiment success: True
-2025-06-29 14:55:18,965 - Running: python main.py --num-agents 2 --seed 1 --level full-divider_tl --model1 rl --model2 rl --search  --evaluator  
-2025-06-29 14:56:12,882 - Agent agent-1: Steps taken: 10000
-2025-06-29 14:56:12,882 - Agent agent-2: Steps taken: 0
-2025-06-29 14:56:12,882 - Time taken for full-divider_tl with rl and rl: 53.48 seconds
-2025-06-29 14:56:12,882 - Experiment success: False
-2025-06-29 14:56:21,910 - Running: python main.py --num-agents 2 --seed 1 --level full-divider_tl --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
-2025-06-29 14:56:22,622 - Planning completed for full-divider_tl in 0.55484030 seconds
-2025-06-29 14:56:22,834 - Agent agent-1: Steps taken: 86
-2025-06-29 14:56:22,834 - Agent agent-2: Steps taken: 86
-2025-06-29 14:56:22,834 - Time taken for full-divider_tl with plan and plan: 0.20 seconds
-2025-06-29 14:56:22,834 - Experiment success: True
-2025-06-29 14:56:22,834 - Deleted plan file: utils/plans/full-divider_tl_plan.txt
-2025-06-29 14:56:31,452 - Running: python main.py --num-agents 2 --seed 1 --level full-divider_tl --model1 plan --model2 plan --search astar(lmcut, bound=infinity, max_time=infinity, description="astar", verbosity=normal) --evaluator lmcut=lmcut(transform=adapt_costs(cost_type=one)) 
-2025-06-29 16:51:11,013 - Planning completed for full-divider_tl in 6879.44518740 seconds
-2025-06-29 16:51:11,156 - Agent agent-1: Steps taken: 45
-2025-06-29 16:51:11,157 - Agent agent-2: Steps taken: 45
-2025-06-29 16:51:11,157 - Time taken for full-divider_tl with plan and plan: 0.13 seconds
-2025-06-29 16:51:11,157 - Experiment success: True
-2025-06-29 16:51:11,157 - Deleted plan file: utils/plans/full-divider_tl_plan.txt
-2025-06-29 16:51:21,623 - Running: python main.py --num-agents 2 --seed 1 --level full-divider_tl --model1 bd --model2 bd --search  --evaluator  
-2025-06-29 17:13:54,791 - Agent agent-1: Steps taken: 46
-2025-06-29 17:13:54,791 - Agent agent-2: Steps taken: 46
-2025-06-29 17:13:54,791 - Time taken for full-divider_tl with bd and bd: 1353.00 seconds
-2025-06-29 17:13:54,791 - Experiment success: True
-2025-06-29 17:14:28,198 - Running: python main.py --num-agents 2 --seed 1 --level partial-divider_tl --model1 rl --model2 rl --search  --evaluator  
-2025-06-29 17:15:25,468 - Agent agent-1: Steps taken: 10000
-2025-06-29 17:15:25,468 - Agent agent-2: Steps taken: 0
-2025-06-29 17:15:25,468 - Time taken for partial-divider_tl with rl and rl: 56.65 seconds
-2025-06-29 17:15:25,468 - Experiment success: False
-2025-06-29 17:15:35,065 - Running: python main.py --num-agents 2 --seed 1 --level partial-divider_tl --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
-2025-06-29 17:15:36,098 - Planning completed for partial-divider_tl in 0.88867310 seconds
-2025-06-29 17:15:36,268 - Agent agent-1: Steps taken: 67
-2025-06-29 17:15:36,269 - Agent agent-2: Steps taken: 67
-2025-06-29 17:15:36,269 - Time taken for partial-divider_tl with plan and plan: 0.16 seconds
-2025-06-29 17:15:36,269 - Experiment success: True
-2025-06-29 17:15:36,269 - Deleted plan file: utils/plans/partial-divider_tl_plan.txt
-2025-06-29 17:15:45,156 - Running: python main.py --num-agents 2 --seed 1 --level partial-divider_tl --model1 plan --model2 plan --search astar(lmcut, bound=infinity, max_time=infinity, description="astar", verbosity=normal) --evaluator lmcut=lmcut(transform=adapt_costs(cost_type=one)) 
-2025-06-29 22:21:32,435 - Planning completed for partial-divider_tl in 18347.12954180 seconds
-2025-06-29 22:21:32,645 - Agent agent-1: Steps taken: 45
-2025-06-29 22:21:32,645 - Agent agent-2: Steps taken: 45
-2025-06-29 22:21:32,645 - Time taken for partial-divider_tl with plan and plan: 0.18 seconds
-2025-06-29 22:21:32,645 - Experiment success: True
-2025-06-29 22:21:32,646 - Deleted plan file: utils/plans/partial-divider_tl_plan.txt
-2025-06-29 22:21:44,808 - Running: python main.py --num-agents 2 --seed 1 --level partial-divider_tl --model1 bd --model2 bd --search  --evaluator  
-2025-06-29 22:49:58,974 - Agent agent-1: Steps taken: 37
-2025-06-29 22:49:58,974 - Agent agent-2: Steps taken: 37
-2025-06-29 22:49:58,974 - Time taken for partial-divider_tl with bd and bd: 1694.02 seconds
-2025-06-29 22:49:58,974 - Experiment success: True
-2025-06-29 22:50:40,993 - Running: python main.py --num-agents 2 --seed 1 --level open-divider_tl --model1 rl --model2 rl --search  --evaluator  
-2025-06-29 22:51:36,263 - Agent agent-1: Steps taken: 10000
-2025-06-29 22:51:36,263 - Agent agent-2: Steps taken: 0
-2025-06-29 22:51:36,263 - Time taken for open-divider_tl with rl and rl: 54.71 seconds
-2025-06-29 22:51:36,263 - Experiment success: False
-2025-06-29 22:51:45,441 - Running: python main.py --num-agents 2 --seed 1 --level open-divider_tl --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
-2025-06-29 22:51:46,625 - Planning completed for open-divider_tl in 1.08256230 seconds
-2025-06-29 22:51:46,755 - Agent agent-1: Steps taken: 51
-2025-06-29 22:51:46,755 - Agent agent-2: Steps taken: 51
-2025-06-29 22:51:46,755 - Time taken for open-divider_tl with plan and plan: 0.12 seconds
-2025-06-29 22:51:46,755 - Experiment success: True
-2025-06-29 22:51:46,756 - Deleted plan file: utils/plans/open-divider_tl_plan.txt
-2025-06-29 22:51:55,608 - Running: python main.py --num-agents 2 --seed 1 --level open-divider_tl --model1 plan --model2 plan --search astar(lmcut, bound=infinity, max_time=infinity, description="astar", verbosity=normal) --evaluator lmcut=lmcut(transform=adapt_costs(cost_type=one)) 
-2025-06-30 06:47:21,169 - Planning completed for open-divider_tl in 28523.12553490 seconds
-2025-06-30 06:47:21,351 - Agent agent-1: Steps taken: 49
-2025-06-30 06:47:21,351 - Agent agent-2: Steps taken: 49
-2025-06-30 06:47:21,351 - Time taken for open-divider_tl with plan and plan: 0.16 seconds
-2025-06-30 06:47:21,351 - Experiment success: True
-2025-06-30 06:47:21,352 - Deleted plan file: utils/plans/open-divider_tl_plan.txt
-2025-06-30 06:47:32,098 - Running: python main.py --num-agents 2 --seed 1 --level open-divider_tl --model1 bd --model2 bd --search  --evaluator  
-2025-06-30 07:14:30,368 - Agent agent-1: Steps taken: 33
-2025-06-30 07:14:30,369 - Agent agent-2: Steps taken: 33
-2025-06-30 07:14:30,369 - Time taken for open-divider_tl with bd and bd: 1618.16 seconds
-2025-06-30 07:14:30,369 - Experiment success: True
+2025-07-01 21:52:33,049 - Running: python main.py --num-agents 2 --seed 1 --level full-divider_salad --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-07-01 21:52:34,056 - Planning completed for full-divider_salad in 0.70489840 seconds
+2025-07-01 21:52:34,193 - Agent agent-1: Steps taken: 55
+2025-07-01 21:52:34,193 - Agent agent-2: Steps taken: 55
+2025-07-01 21:52:34,193 - Time taken for full-divider_salad with plan and plan: 0.14 seconds
+2025-07-01 21:52:34,193 - Experiment success: True
+2025-07-01 21:52:34,194 - Deleted plan file: utils/plans/full-divider_salad_plan.txt
+2025-07-01 21:52:42,991 - Running: python main.py --num-agents 2 --seed 1 --level full-divider_salad --model1 plan --model2 plan --search astar(lmcut, bound=infinity, max_time=infinity, description="astar", verbosity=normal) --evaluator lmcut=lmcut(transform=adapt_costs(cost_type=one)) 
+2025-07-01 21:55:02,676 - Planning completed for full-divider_salad in 139.32848590 seconds
+2025-07-01 21:55:02,769 - Agent agent-1: Steps taken: 33
+2025-07-01 21:55:02,769 - Agent agent-2: Steps taken: 33
+2025-07-01 21:55:02,769 - Time taken for full-divider_salad with plan and plan: 0.09 seconds
+2025-07-01 21:55:02,769 - Experiment success: True
+2025-07-01 21:55:02,769 - Deleted plan file: utils/plans/full-divider_salad_plan.txt
+2025-07-01 21:55:11,558 - Running: python main.py --num-agents 2 --seed 1 --level partial-divider_salad --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-07-01 21:55:12,851 - Planning completed for partial-divider_salad in 0.94520540 seconds
+2025-07-01 21:55:12,955 - Agent agent-1: Steps taken: 40
+2025-07-01 21:55:12,955 - Agent agent-2: Steps taken: 40
+2025-07-01 21:55:12,955 - Time taken for partial-divider_salad with plan and plan: 0.10 seconds
+2025-07-01 21:55:12,955 - Experiment success: True
+2025-07-01 21:55:12,955 - Deleted plan file: utils/plans/partial-divider_salad_plan.txt
+2025-07-01 21:55:21,720 - Running: python main.py --num-agents 2 --seed 1 --level partial-divider_salad --model1 plan --model2 plan --search astar(lmcut, bound=infinity, max_time=infinity, description="astar", verbosity=normal) --evaluator lmcut=lmcut(transform=adapt_costs(cost_type=one)) 
+2025-07-01 22:01:21,234 - Planning completed for partial-divider_salad in 359.29168770 seconds
+2025-07-01 22:01:21,322 - Agent agent-1: Steps taken: 33
+2025-07-01 22:01:21,322 - Agent agent-2: Steps taken: 33
+2025-07-01 22:01:21,322 - Time taken for partial-divider_salad with plan and plan: 0.08 seconds
+2025-07-01 22:01:21,322 - Experiment success: True
+2025-07-01 22:01:21,322 - Deleted plan file: utils/plans/partial-divider_salad_plan.txt
+2025-07-01 22:01:30,024 - Running: python main.py --num-agents 2 --seed 1 --level open-divider_salad --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-07-01 22:01:31,193 - Planning completed for open-divider_salad in 0.94001710 seconds
+2025-07-01 22:01:31,303 - Agent agent-1: Steps taken: 44
+2025-07-01 22:01:31,303 - Agent agent-2: Steps taken: 44
+2025-07-01 22:01:31,303 - Time taken for open-divider_salad with plan and plan: 0.11 seconds
+2025-07-01 22:01:31,303 - Experiment success: True
+2025-07-01 22:01:31,303 - Deleted plan file: utils/plans/open-divider_salad_plan.txt
+2025-07-01 22:01:39,949 - Running: python main.py --num-agents 2 --seed 1 --level open-divider_salad --model1 plan --model2 plan --search astar(lmcut, bound=infinity, max_time=infinity, description="astar", verbosity=normal) --evaluator lmcut=lmcut(transform=adapt_costs(cost_type=one)) 
+2025-07-01 22:26:23,315 - Planning completed for open-divider_salad in 1483.07411820 seconds
+2025-07-01 22:26:23,409 - Agent agent-1: Steps taken: 36
+2025-07-01 22:26:23,409 - Agent agent-2: Steps taken: 36
+2025-07-01 22:26:23,409 - Time taken for open-divider_salad with plan and plan: 0.09 seconds
+2025-07-01 22:26:23,409 - Experiment success: True
+2025-07-01 22:26:23,409 - Deleted plan file: utils/plans/open-divider_salad_plan.txt
+2025-07-01 22:26:32,865 - Running: python main.py --num-agents 2 --seed 1 --level full-divider_tomato --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-07-01 22:26:33,604 - Planning completed for full-divider_tomato in 0.59051920 seconds
+2025-07-01 22:26:33,666 - Agent agent-1: Steps taken: 23
+2025-07-01 22:26:33,666 - Agent agent-2: Steps taken: 23
+2025-07-01 22:26:33,666 - Time taken for full-divider_tomato with plan and plan: 0.06 seconds
+2025-07-01 22:26:33,666 - Experiment success: True
+2025-07-01 22:26:33,666 - Deleted plan file: utils/plans/full-divider_tomato_plan.txt
+2025-07-01 22:26:42,230 - Running: python main.py --num-agents 2 --seed 1 --level full-divider_tomato --model1 plan --model2 plan --search astar(lmcut, bound=infinity, max_time=infinity, description="astar", verbosity=normal) --evaluator lmcut=lmcut(transform=adapt_costs(cost_type=one)) 
+2025-07-01 22:26:46,552 - Planning completed for full-divider_tomato in 4.17413710 seconds
+2025-07-01 22:26:46,615 - Agent agent-1: Steps taken: 23
+2025-07-01 22:26:46,615 - Agent agent-2: Steps taken: 23
+2025-07-01 22:26:46,615 - Time taken for full-divider_tomato with plan and plan: 0.06 seconds
+2025-07-01 22:26:46,615 - Experiment success: True
+2025-07-01 22:26:46,615 - Deleted plan file: utils/plans/full-divider_tomato_plan.txt
+2025-07-01 22:26:55,210 - Running: python main.py --num-agents 2 --seed 1 --level partial-divider_tomato --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-07-01 22:26:56,218 - Planning completed for partial-divider_tomato in 0.86899330 seconds
+2025-07-01 22:26:56,265 - Agent agent-1: Steps taken: 23
+2025-07-01 22:26:56,265 - Agent agent-2: Steps taken: 23
+2025-07-01 22:26:56,265 - Time taken for partial-divider_tomato with plan and plan: 0.05 seconds
+2025-07-01 22:26:56,265 - Experiment success: True
+2025-07-01 22:26:56,265 - Deleted plan file: utils/plans/partial-divider_tomato_plan.txt
+2025-07-01 22:27:04,944 - Running: python main.py --num-agents 2 --seed 1 --level partial-divider_tomato --model1 plan --model2 plan --search astar(lmcut, bound=infinity, max_time=infinity, description="astar", verbosity=normal) --evaluator lmcut=lmcut(transform=adapt_costs(cost_type=one)) 
+2025-07-01 22:27:14,322 - Planning completed for partial-divider_tomato in 9.23597820 seconds
+2025-07-01 22:27:14,368 - Agent agent-1: Steps taken: 23
+2025-07-01 22:27:14,368 - Agent agent-2: Steps taken: 23
+2025-07-01 22:27:14,368 - Time taken for partial-divider_tomato with plan and plan: 0.05 seconds
+2025-07-01 22:27:14,368 - Experiment success: True
+2025-07-01 22:27:14,368 - Deleted plan file: utils/plans/partial-divider_tomato_plan.txt
+2025-07-01 22:27:23,134 - Running: python main.py --num-agents 2 --seed 1 --level open-divider_tomato --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-07-01 22:27:24,154 - Planning completed for open-divider_tomato in 0.91822240 seconds
+2025-07-01 22:27:24,214 - Agent agent-1: Steps taken: 24
+2025-07-01 22:27:24,214 - Agent agent-2: Steps taken: 24
+2025-07-01 22:27:24,215 - Time taken for open-divider_tomato with plan and plan: 0.06 seconds
+2025-07-01 22:27:24,215 - Experiment success: True
+2025-07-01 22:27:24,215 - Deleted plan file: utils/plans/open-divider_tomato_plan.txt
+2025-07-01 22:27:33,013 - Running: python main.py --num-agents 2 --seed 1 --level open-divider_tomato --model1 plan --model2 plan --search astar(lmcut, bound=infinity, max_time=infinity, description="astar", verbosity=normal) --evaluator lmcut=lmcut(transform=adapt_costs(cost_type=one)) 
+2025-07-01 22:27:49,360 - Planning completed for open-divider_tomato in 16.24725750 seconds
+2025-07-01 22:27:49,417 - Agent agent-1: Steps taken: 23
+2025-07-01 22:27:49,417 - Agent agent-2: Steps taken: 23
+2025-07-01 22:27:49,417 - Time taken for open-divider_tomato with plan and plan: 0.06 seconds
+2025-07-01 22:27:49,417 - Experiment success: True
+2025-07-01 22:27:49,418 - Deleted plan file: utils/plans/open-divider_tomato_plan.txt
+2025-07-01 22:27:58,130 - Running: python main.py --num-agents 2 --seed 1 --level full-divider_tl --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-07-01 22:27:59,015 - Planning completed for full-divider_tl in 0.72068310 seconds
+2025-07-01 22:27:59,224 - Agent agent-1: Steps taken: 86
+2025-07-01 22:27:59,224 - Agent agent-2: Steps taken: 86
+2025-07-01 22:27:59,224 - Time taken for full-divider_tl with plan and plan: 0.21 seconds
+2025-07-01 22:27:59,224 - Experiment success: True
+2025-07-01 22:27:59,224 - Deleted plan file: utils/plans/full-divider_tl_plan.txt
+2025-07-01 22:28:07,915 - Running: python main.py --num-agents 2 --seed 1 --level full-divider_tl --model1 plan --model2 plan --search astar(lmcut, bound=infinity, max_time=infinity, description="astar", verbosity=normal) --evaluator lmcut=lmcut(transform=adapt_costs(cost_type=one)) 
+2025-07-02 07:47:03,272 - Planning completed for full-divider_tl in 33535.24131990 seconds
+2025-07-02 07:47:03,395 - Agent agent-1: Steps taken: 45
+2025-07-02 07:47:03,395 - Agent agent-2: Steps taken: 45
+2025-07-02 07:47:03,395 - Time taken for full-divider_tl with plan and plan: 0.11 seconds
+2025-07-02 07:47:03,395 - Experiment success: True
+2025-07-02 07:47:03,396 - Deleted plan file: utils/plans/full-divider_tl_plan.txt
+2025-07-02 07:47:13,209 - Running: python main.py --num-agents 2 --seed 1 --level partial-divider_tl --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-07-02 07:47:14,346 - Planning completed for partial-divider_tl in 0.98811420 seconds
+2025-07-02 07:47:14,547 - Agent agent-1: Steps taken: 67
+2025-07-02 07:47:14,548 - Agent agent-2: Steps taken: 67
+2025-07-02 07:47:14,548 - Time taken for partial-divider_tl with plan and plan: 0.19 seconds
+2025-07-02 07:47:14,548 - Experiment success: True
+2025-07-02 07:47:14,548 - Deleted plan file: utils/plans/partial-divider_tl_plan.txt
+2025-07-02 07:47:23,667 - Running: python main.py --num-agents 2 --seed 1 --level partial-divider_tl --model1 plan --model2 plan --search astar(lmcut, bound=infinity, max_time=infinity, description="astar", verbosity=normal) --evaluator lmcut=lmcut(transform=adapt_costs(cost_type=one)) 
+2025-07-02 12:49:19,876 - Planning completed for partial-divider_tl in 18116.06445690 seconds
+2025-07-02 12:49:20,026 - Agent agent-1: Steps taken: 45
+2025-07-02 12:49:20,026 - Agent agent-2: Steps taken: 45
+2025-07-02 12:49:20,026 - Time taken for partial-divider_tl with plan and plan: 0.13 seconds
+2025-07-02 12:49:20,026 - Experiment success: True
+2025-07-02 12:49:20,026 - Deleted plan file: utils/plans/partial-divider_tl_plan.txt
+2025-07-02 12:49:30,675 - Running: python main.py --num-agents 2 --seed 1 --level open-divider_tl --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-07-02 12:49:31,923 - Planning completed for open-divider_tl in 1.14112840 seconds
+2025-07-02 12:49:32,052 - Agent agent-1: Steps taken: 51
+2025-07-02 12:49:32,052 - Agent agent-2: Steps taken: 51
+2025-07-02 12:49:32,052 - Time taken for open-divider_tl with plan and plan: 0.12 seconds
+2025-07-02 12:49:32,052 - Experiment success: True
+2025-07-02 12:49:32,053 - Deleted plan file: utils/plans/open-divider_tl_plan.txt
+2025-07-02 12:49:40,958 - Running: python main.py --num-agents 2 --seed 1 --level open-divider_tl --model1 plan --model2 plan --search astar(lmcut, bound=infinity, max_time=infinity, description="astar", verbosity=normal) --evaluator lmcut=lmcut(transform=adapt_costs(cost_type=one)) 

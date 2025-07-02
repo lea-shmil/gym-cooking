@@ -17,6 +17,8 @@ class RLAgent:
         #, n_steps=100, batch_size=20
         self.model = PPO("MlpPolicy", env, verbose=1)
         self.steps_taken = 0
+        self.successful = False
+        self.steps_to_success = 0
 
         # # Define the mapping from discrete actions to navigation actions
         # #written in utils.py
@@ -46,7 +48,9 @@ class RLAgent:
         """
         callback = TrajectoryCallback(self.env, total_timesteps,  trajectory_dir="misc/metrics/trajectories")
         self.model.learn(total_timesteps=total_timesteps, callback=callback)
+        self.successful = callback.success_logged
         self.steps_taken += total_timesteps  # Increment steps counter
+        self.steps_to_success = callback.steps_to_success
 
         # Save the model with a timestamp
         timestamp = time.strftime("%Y%m%d-%H%M%S")

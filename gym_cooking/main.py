@@ -225,12 +225,16 @@ def main_loop(arglist):
 
     # Log metrics
     for agent in real_agents:
+        if isinstance(agent, RLAgent):
+            logger.info(f"Agents succeeded after {agent.steps_to_success} steps.")
         logger.info(f"Agent {agent.name}: Steps taken: {agent.steps_taken}")
-    #logger.info(f"Total steps taken: {sum(agent.steps_taken for agent in real_agents)}")
     logger.info(f"Time taken for {arglist.level} with {arglist.model1} and {arglist.model2}: {elapsed_time:.2f} seconds")
 
     # Log overall success
-    logger.info(f"Experiment success: {env.successful}")
+    success = env.successful
+    if isinstance(real_agents[0], RLAgent):
+        success = real_agents[0].successful
+    logger.info(f"Experiment success: {success}")
 
     # Delete the plan file after the run is complete
     if isinstance(real_agents[0], plan_agent):
