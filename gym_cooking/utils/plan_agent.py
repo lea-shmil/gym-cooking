@@ -11,7 +11,6 @@ from gym_cooking.utils.plans.transfer_single import parallel_execution
 logging.root.setLevel(logging.ERROR)
 
 
-
 class plan_agent:
     def __init__(self, name, id_color, recipes, arglist, env, logger, evaluator="hcea=cea()", search="lazy_greedy([hcea], preferred=[hcea])"):
         self.name = name
@@ -58,11 +57,12 @@ class plan_agent:
                 domain_file,
                 problem_file,
                 f"{self.evaluator}",
-                f"{self.search}"
+                f"{self.search}",
+                f"{self.env.seed}"
             ]
 
             result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-            #print(result)
+            print(result)
 
             # Construct path to the sas_plan file inside gym_cooking directory
             base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))  # gym_cooking/utils -> gym_cooking C:\Users\Administrator\Documents\GitHub\gym-cooking\gym_cooking\sas_plan
@@ -77,26 +77,17 @@ class plan_agent:
                 file.writelines(lines)
 
             result = parallel_execution(domain_file, problem_file, sas_plan_path, ["a1", "a2"])
-
-
-
+            print(result)
             if os.path.exists(sas_plan_path):
-                with open(sas_plan_path, "r") as f_in, open(self.plan_file_path, "w") as f_out:
-
+                with open(self.plan_file_path, "w") as f_out:
                     for joint_action in result:
                         # joint_action.actions is a list of ActionCall objects
-                        for action_call in joint_action.actions:
-                            if action_call.name.strip().lower() != "nop":
-                                # Build a readable string of the action (e.g., "move a2 x1y1 x1y2")
-                                action_str = f"{action_call.name} {' '.join(action_call.parameters)}"
-                                f_out.write(f"({action_str})\n")
+                        f_out.write(f"({joint_action})\n")
 
                 end_time = time.perf_counter()
                 elapsed_time = end_time - start_time
                 # Log the planning time
                 self.logger.info(f"Planning completed for {self.arglist.level} in {elapsed_time:.8f} seconds")
-
-                # print(joint_actions)
             else:
                 self.logger.error(f"Planner did not produce the plan file at expected location: {sas_plan_path}")
                 self.logger.error(f"Experiment success: False")
@@ -125,12 +116,19 @@ class plan_agent:
 
     def _parse_action(self, action_line):
         """Parse a textual action into an environment action."""
-        parts = action_line.split()
-        agent_num = parts[1][1]  # agent num A[1]
-        if agent_num != self.name.split('-')[1]:  # Check if the action is for this agent
+        actions = re.findall(r'\(([^()]*)\)', action_line)
+        pair = {}
+        if len(actions) >= 1:
+            pair['1'] = actions[0]
+        if len(actions) >= 2:
+            pair['2'] = actions[1]
+
+        action = pair[self.name.split('-')[1]]  # agent 1 -> pair[1]
+        if action == "nop ":  # Check if the action is for this agent
             return 0, 0  # No-op if not for this agent
-        start = parts[2]  # e.g., X4Y1
-        end = parts[3]    # e.g., X5Y1
+        action = action.split(" ")
+        start = action[2]  # e.g., X4Y1
+        end = action[3]    # e.g., X5Y1
 
         # Calculate the movement direction
         start_x, start_y = int(start[1]), int(start[3])
@@ -147,7 +145,6 @@ class plan_agent:
         print(f"Agent {self.name} executing action: {self.actions_queue[0]}")
         return self.actions_queue.pop(0)
 
-
     def parallel_execution(self, domain: str, problem: str, agent_names: list, suffix: str = "") -> list:
         """
         Transform a single-agent PDDL solution file to a multi-agent PDDL solution file
@@ -162,30 +159,21 @@ class plan_agent:
         Returns:
             list: A list of joint actions for the agents.
         """
-
         from pathlib import Path
-
-
         # Parse the domain and problem files
         domain_parser = DomainParser(domain).parse_domain()
         uproblem = ProblemParser(problem_path=problem, domain=domain_parser)
-
         # Convert the single-agent plan to a multi-agent plan
         plan_converter = PlanConverter(domain_parser)
-        print(uproblem.parse_problem())
-
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
         plan_file_path = os.path.abspath(
             os.path.join(base_dir, "gym_cooking", "utils", "plans", f"{self.arglist.level}_plan.txt")
         )
-        print(plan_file_path)
         joint_actions = plan_converter.convert_plan(
             uproblem.parse_problem(), plan_file_path, agent_names
         )
-
         with open(problem, "w") as f:
             f.write("\n; Joint Actions\n")
             for action in joint_actions:
                 f.write(f"{action}\n")
-
         return joint_actions

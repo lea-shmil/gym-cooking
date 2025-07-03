@@ -174,26 +174,6 @@ def main_loop(arglist):
     while (not env.done()) and rl_flag:
 
         action_dict = {}
-        # observations = []
-        # predictions = []
-        #
-        # for agent in real_agents:
-        #     if isinstance(agent, RLAgent):
-        #         # Use the RL agent's select_action method
-        #         observations.append(obs)
-        #         predictions.append(agent.select_action(obs=obs))
-        #     else:
-        #         # Non-RL agent: same as before
-        #         action = agent.select_action(obs=obs)
-        #         action_dict[agent.name] = action
-
-        # Super-agent resolves conflicts for RL agents
-        #         if observations and predictions:
-        #             final_actions = super_agent.select_actions(observations, predictions)
-        #             for i, agent in enumerate(real_agents):
-        #                 if isinstance(agent, RLAgent):
-        #                     action_dict[agent.name] = final_actions[i]
-        #                     print("here the action dict is being updated" + str(action_dict))
         for agent in real_agents:
             if not isinstance(agent, RLAgent):
                 if isinstance(agent, plan_agent):

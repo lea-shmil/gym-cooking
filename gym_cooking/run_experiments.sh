@@ -4,10 +4,12 @@ source /c/Users/Administrator/anaconda3/etc/profile.d/conda.sh
 
 conda activate gym_cooking
 
-levels=("full-divider_salad" "partial-divider_salad" "open-divider_salad" "full-divider_tomato" "partial-divider_tomato" "open-divider_tomato" "full-divider_tl" "partial-divider_tl" "open-divider_tl")
-#levels=("open-divider_tomato")
-#models=("rl" "plan" "plan" "bd")
-models=("plan" "plan")
+#levels=("full-divider_salad" "partial-divider_salad" "open-divider_salad" "full-divider_tomato" "partial-divider_tomato" "open-divider_tomato" "full-divider_tl" "partial-divider_tl" "open-divider_tl")
+levels1=("full-divider_tomato" "partial-divider_tomato" "open-divider_tomato")
+levels2=("full-divider_salad" "partial-divider_salad" "open-divider_salad")
+levels3=("full-divider_tl" "partial-divider_tl" "open-divider_tl")
+models=("rl" "plan" "plan" "bd")
+#models=("rl" "plan")
 
 nagents=2
 nseed=1
@@ -28,7 +30,7 @@ search2='astar(lmcut, bound=infinity, max_time=infinity, description="astar", ve
 plan_run_counter=0
 
 # Loop over levels, models, and seeds
-for level in "${levels[@]}"; do
+for level in "${levels2[@]}"; do
   for model in "${models[@]}"; do
     for seed in $(seq 1 $nseed); do
       if [[ "$model" == "plan" ]]; then
@@ -47,12 +49,12 @@ for level in "${levels[@]}"; do
       fi
       # Set max-num-timesteps based on the model
       if [[ "$model" == "rl" ]]; then
-        max_timesteps="--max-num-timesteps 30000"
+        max_timesteps="--max-num-timesteps 10000"
       else
         max_timesteps="--max-num-timesteps 100"
       fi
 
-      echo "Running experiment wit h $max_timesteps, level=$level, model=$model, seed=$seed, evaluator=$evaluator, search=$search"
+      echo "Running experiments with $max_timesteps, level=$level, model=$model, seed=$seed, evaluator=$evaluator, search=$search"
       python main.py $max_timesteps --num-agents $nagents --seed $seed --level $level --model1 $model --model2 $model --evaluator "$evaluator" --search "$search"
       sleep 5
     done
