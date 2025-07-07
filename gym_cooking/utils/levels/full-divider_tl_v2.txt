@@ -1,0 +1,15 @@
+----p--
+/  -  -
+p  -  t
+*  -  -
+-  -  /
+-  -  -
+--l----
+
+SimpleTomato
+SimpleLettuce
+
+5 3
+2 5
+4 4
+2 4

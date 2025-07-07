@@ -9,6 +9,6 @@ p     p
 SimpleTomato
 
 2 1
-1 6
+1 5
 4 4
 2 4
