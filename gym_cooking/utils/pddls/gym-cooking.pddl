@@ -22,7 +22,6 @@
   (not-plate ?o - veggieOrPlate) ; for objects that are not plates
   (chopped ?o - veggieOrPlate)
   (delivered ?o - veggieOrPlate)
-  (dummy-additional-predicate)
 )
 
 ; when agent moves how to make sure everything they carry moves?'

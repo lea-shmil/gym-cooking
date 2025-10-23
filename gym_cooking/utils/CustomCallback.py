@@ -2,7 +2,7 @@ from stable_baselines3.common.callbacks import BaseCallback
 import time
 import os
 
-from gym_cooking.envs.OvercookedRLWrapper import get_state
+from gym_cooking.utils.pddl_problem_generator import get_state
 
 
 class TrajectoryCallback(BaseCallback):

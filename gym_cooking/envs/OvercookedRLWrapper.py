@@ -1,23 +1,10 @@
 import json
-
 import numpy as np
 from gym import Wrapper
 from gym.spaces import Box, MultiDiscrete
-
 from gym_cooking.utils.agent import AgentRepr
 import os
 
-world_object_map = {
-    'Counter': 3,
-    'Floor': 4,
-    'Cutboard': 5,
-    'Delivery': 6,
-    'Tomato': 7,
-    'Lettuce': 8,
-    'Plate': 9}
-
-AGENT_PROPERTIES = 3
-OBJECT_PROPERTIES = 7
 
 action_mapping = {
     0: (0, -1),  # Move up
@@ -44,6 +31,20 @@ tile_type = {
     8: "lettuce",
     9: "plate"
 }
+
+
+world_object_map = {
+    'Counter': 3,
+    'Floor': 4,
+    'Cutboard': 5,
+    'Delivery': 6,
+    'Tomato': 7,
+    'Lettuce': 8,
+    'Plate': 9}
+
+
+AGENT_PROPERTIES = 3
+OBJECT_PROPERTIES = 7
 
 
 class OvercookedRLWrapper(Wrapper):
@@ -165,64 +166,6 @@ class OvercookedRLWrapper(Wrapper):
             offset += OBJECT_PROPERTIES
         return vector
 
-    def state_to_pddl(self, state, name_of_level, world_width, world_height, pddl_file_path):
-        """
-        Translates the state vector into a PDDL file.
-
-        Args:
-            state: The state vector representing the world.
-            world_width: Width of the grid world.
-            world_height: Height of the grid world.
-            pddl_file_path: Path to save the generated PDDL file.
-        """
-
-        with open(pddl_file_path, 'w') as pddl_file:
-            # Write PDDL header
-            pddl_file.write("; PDDL file for " + name_of_level + "\n")
-            pddl_file.write("(define (problem " + name_of_level + ")\n")
-            pddl_file.write("(:domain grid_overcooked)\n")
-
-            # grid cells
-            pddl_file.write("(:objects\n")
-            for x in range(world_width):
-                for y in range(world_height):
-                    pddl_file.write(f"    x{x}y{y} - cell\n")
-
-            pddl_file.write("    a1 - agent\n")
-            pddl_file.write("    a2 - agent\n")
-            pddl_file.write("    p1 - object\n")
-            pddl_file.write("    p2 - object\n")
-            pddl_file.write("    l1 - object\n")
-            pddl_file.write("    t1 - object\n")
-            pddl_file.write(")\n\n")
-
-            # Define initial state
-            pddl_file.write("(:init\n")
-            get_state(pddl_file, state, world_width, world_height)
-
-            # Define goal
-            pddl_file.write("(:goal\n")
-            if "tomato" in name_of_level:
-                pddl_file.write("   (and (delivered t1)\n")
-                pddl_file.write("       (tomato t1)\n")
-            elif "salad" in name_of_level:
-                pddl_file.write("   ;(or\n")
-                pddl_file.write("       (and (delivered t1)\n")
-                pddl_file.write("           (tomato t1)\n")
-                pddl_file.write("           (lettuce t1)\n")
-                pddl_file.write("       ;(and (delivered l1)\n")
-                pddl_file.write("           ;(lettuce l1)\n")
-                pddl_file.write("           ;(tomato l1))\n")
-            elif "tl" in name_of_level:
-                pddl_file.write("   (and \n")
-                pddl_file.write("       (delivered t1)\n")
-                pddl_file.write("       (tomato t1)\n")
-                pddl_file.write("       (delivered l1)\n")
-                pddl_file.write("       (lettuce l1)\n")
-            pddl_file.write("   )\n")  # first or/and
-            pddl_file.write(")\n")  # goal
-            pddl_file.write(")\n")  # end of define
-
     def get_parameters(self, f, action_dict, width, height):
         offset = width * height
         object_offset = offset + AGENT_PROPERTIES * len(action_dict)  # Start after the grid and agent properties
@@ -313,52 +256,4 @@ class OvercookedRLWrapper(Wrapper):
         f.write(" ".join(actions) + ")\n")  # Close the operators section
 
 
-def get_state(pddl_file, state, world_width, world_height):
-    # add grid and objects
-    grid_size = world_width * world_height
 
-    # add agents
-    offset = grid_size
-    agent_locs = {}
-    for i in range(2):  # Assuming 2 agents
-        x, y, num = state[offset], state[offset + 1], state[offset + 2]
-        pddl_file.write(f" (agent_at a{num} x{x}y{y})")
-        pddl_file.write(f" (holding_nothing a{num})")
-        pddl_file.write(f" (occupied x{x}y{y})")
-        offset += 3
-        agent_locs[f'a{num}'] = (x, y)  # Store agent locations for later use
-    #
-
-    for i in range(grid_size):
-        x, y = divmod(i, world_width)
-        if state[i] == world_object_map['Floor']:
-            pddl_file.write(f" (is_floor x{x}y{y})")
-        elif state[i] == world_object_map['Cutboard']:
-            pddl_file.write(f" (is_cutting_board x{x}y{y})")
-        elif state[i] == world_object_map['Delivery']:
-            pddl_file.write(f" (delivery_spot x{x}y{y})")
-
-    for i in range(grid_size + AGENT_PROPERTIES*2, len(state), OBJECT_PROPERTIES):
-        x, y = state[i + 5], state[i + 6]
-        # go over map find key that matches the value of state[i]
-        pddl_file.write(f" (object_at {pddl_name[state[i]]} x{x}y{y})")
-        pddl_file.write(f" (occupied x{x}y{y})")
-        word = tile_type.get(state[i]+6, 'plate')
-        if word != 'plate':
-            pddl_file.write(f" (not-plate {pddl_name[state[i]]})")
-
-        # tomato t1
-        pddl_file.write(f" ({word} {pddl_name[state[i]]})")
-
-
-    # adjacency predicates
-    for x in range(world_width):
-        for y in range(world_height):
-            if x + 1 < world_width:
-                pddl_file.write(f" (adjacent x{x}y{y} x{x + 1}y{y})")
-                pddl_file.write(f" (adjacent x{x + 1}y{y} x{x}y{y})")
-            if y + 1 < world_height:
-                pddl_file.write(f" (adjacent x{x}y{y} x{x}y{y + 1})")
-                pddl_file.write(f" (adjacent x{x}y{y + 1} x{x}y{y})")
-
-    pddl_file.write(")\n")

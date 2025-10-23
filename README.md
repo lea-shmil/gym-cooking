@@ -1,4 +1,6 @@
 Maps
     To create new maps add textual maps to utils/levels following the instructions in design.md
-    The pddl maps are generated automatically from the textual maps by running the RLagent on them for the first time. 
-    The code converting the environment to pddl is in envs/overCookedRLWrapper.py
+    The pddl maps can be generated using the pddl_problem_generator.py script. simply provide the path to the textual 
+    map and the desired output path for the pddl file.
+    
+    

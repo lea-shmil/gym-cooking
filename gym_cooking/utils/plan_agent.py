@@ -75,8 +75,8 @@ class plan_agent:
             lines = lines[:-1]
             with open(sas_plan_path, "w") as file:
                 file.writelines(lines)
-
-            result = parallel_execution(domain_file, problem_file, sas_plan_path, ["a1", "a2"])
+            agent_names = ["a1", "a2", "a3", "a4"][:self.env.arglist.num_agents]
+            result = parallel_execution(domain_file, problem_file, sas_plan_path, agent_names)
             print(result)
             if os.path.exists(sas_plan_path):
                 with open(self.plan_file_path, "w") as f_out:
@@ -122,8 +122,13 @@ class plan_agent:
             pair['1'] = actions[0]
         if len(actions) >= 2:
             pair['2'] = actions[1]
+        if len(actions) >= 3:
+            pair['3'] = actions[2]
+        if len(actions) >= 4:
+            pair['4'] = actions[3]
 
         action = pair[self.name.split('-')[1]]  # agent 1 -> pair[1]
+        print(action)
         if action == "nop ":  # Check if the action is for this agent
             return 0, 0  # No-op if not for this agent
         action = action.split(" ")
