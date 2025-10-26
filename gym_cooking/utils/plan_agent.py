@@ -12,7 +12,8 @@ logging.root.setLevel(logging.ERROR)
 
 
 class plan_agent:
-    def __init__(self, name, id_color, recipes, arglist, env, logger, evaluator="hcea=cea()", search="lazy_greedy([hcea], preferred=[hcea])"):
+    def __init__(self, name, id_color, recipes, arglist, env, logger, evaluator="hcea=cea()",
+                 search="lazy_greedy([hcea], preferred=[hcea])"):
         self.name = name
         self.color = id_color
         self.recipes = recipes
@@ -31,8 +32,10 @@ class plan_agent:
 
         # Convert relative paths to absolute paths
         domain_file = os.path.abspath(os.path.join(base_dir, "gym_cooking", "utils", "pddls", "gym-cooking.pddl"))
-        problem_file = os.path.abspath(os.path.join(base_dir, "gym_cooking", "utils", "pddls", f"{self.arglist.level}.pddl"))
-        planner_script = os.path.abspath(os.path.join(base_dir, "gym_cooking", "downward-release-24.06.1", "fast-downward.py"))
+        problem_file = os.path.abspath(
+            os.path.join(base_dir, "gym_cooking", "utils", "pddls", f"{self.arglist.level}.pddl"))
+        planner_script = os.path.abspath(
+            os.path.join(base_dir, "gym_cooking", "downward-release-24.06.1", "fast-downward.py"))
 
         # Ensure paths are compatible with the operating system
         if os.name == "posix":  # Unix-like systems
@@ -65,10 +68,11 @@ class plan_agent:
             print(result)
 
             # Construct path to the sas_plan file inside gym_cooking directory
-            base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))  # gym_cooking/utils -> gym_cooking C:\Users\Administrator\Documents\GitHub\gym-cooking\gym_cooking\sas_plan
+            # gym_cooking/utils -> gym_cooking C:\Users\Administrator\Documents\GitHub\gym-cooking\gym_cooking\sas_plan
+            base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
             sas_plan_path = os.path.join(base_dir, "sas_plan")
 
-            #remove last line from sas_plan file
+            #  remove last line from sas_plan file
             with open(sas_plan_path, "r") as file:
                 lines = file.readlines()
             # Remove the last line

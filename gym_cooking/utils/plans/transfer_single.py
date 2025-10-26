@@ -1,18 +1,12 @@
 # This code is written by Yarin Benyamin.
-# It is an work in progress of the code from the following link:
+# It is a work in progress of the code from the following link:
 # https://github.com/SPL-BGU/ActionBasedNovelty/blob/main/heuristic_functions.py
 
-
-from pddl_plus_parser.models import ActionCall
 from pddl_plus_parser.multi_agent import PlanConverter
-
 from pddl_plus_parser.lisp_parsers import DomainParser, ProblemParser
-
 import logging
 
 logging.root.setLevel(logging.ERROR)
-
-from pathlib import Path
 
 
 # Configure the PlanConverter logger
@@ -23,6 +17,7 @@ console_handler.setLevel(logging.DEBUG)
 formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 console_handler.setFormatter(formatter)
 plan_converter_logger.addHandler(console_handler)
+
 
 def parallel_execution(
     domain: str, problem: str, solution: str,  agent_names: list, suffix: str = ""

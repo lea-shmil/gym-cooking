@@ -118,3 +118,133 @@
 2025-07-02 12:49:32,052 - Experiment success: True
 2025-07-02 12:49:32,053 - Deleted plan file: utils/plans/open-divider_tl_plan.txt
 2025-07-02 12:49:40,958 - Running: python main.py --num-agents 2 --seed 1 --level open-divider_tl --model1 plan --model2 plan --search astar(lmcut, bound=infinity, max_time=infinity, description="astar", verbosity=normal) --evaluator lmcut=lmcut(transform=adapt_costs(cost_type=one)) 
+2025-10-23 13:47:10,772 - Running: python main.py --num-agents 2 --seed 1 --level example_salad --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-23 13:47:55,314 - Running: python main.py --num-agents 2 --seed 1 --level example_salad --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-23 13:50:13,161 - Running: python main.py --num-agents 2 --seed 1 --level example_salad --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-23 14:25:45,534 - Running: python main.py --num-agents 4 --seed 1 --level example_salad --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-23 14:27:05,798 - Running: python main.py --num-agents 4 --seed 1 --level example_salad --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-23 14:30:10,460 - Running: python main.py --num-agents 4 --seed 1 --level example_salad --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-23 14:30:46,467 - Running: python main.py --num-agents 4 --seed 1 --level example_tomato --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-23 14:30:59,730 - Running: python main.py --num-agents 4 --seed 1 --level example_tomato --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-23 14:31:27,014 - Running: python main.py --num-agents 4 --seed 1 --level example_tomato --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-23 14:43:16,711 - Running: python main.py --num-agents 4 --seed 1 --level example_tomato --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-23 14:43:30,260 - Running: python main.py --num-agents 4 --seed 1 --level example_tomato --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-23 14:47:51,796 - Running: python main.py --num-agents 2 --seed 1 --level full-divider_tomato --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-23 14:54:15,520 - Running: python main.py --num-agents 2 --seed 1 --level full-divider_tomato --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-23 14:54:18,077 - Planning completed for full-divider_tomato in 1.97951800 seconds
+2025-10-23 14:56:35,230 - Running: python main.py --num-agents 2 --seed 1 --level full-divider_tomato --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-23 17:26:20,473 - Running: python main.py --num-agents 2 --seed 1 --level full-divider_tomato --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-23 17:28:00,339 - Running: python main.py --num-agents 2 --seed 1 --level full-divider_tomato --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-23 17:29:48,167 - Running: python main.py --num-agents 2 --seed 1 --level full-divider_tomato --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-23 17:32:53,016 - Running: python main.py --num-agents 2 --seed 1 --level full-divider_tomato --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-23 17:32:55,360 - Planning completed for full-divider_tomato in 1.82452200 seconds
+2025-10-23 17:33:00,507 - Agent agent-1: Steps taken: 19
+2025-10-23 17:33:00,507 - Agent agent-2: Steps taken: 19
+2025-10-23 17:33:00,507 - Time taken for full-divider_tomato with plan and plan: 5.14 seconds
+2025-10-23 17:33:00,508 - Experiment success: True
+2025-10-23 17:33:00,508 - Deleted plan file: utils/plans/full-divider_tomato_plan.txt
+2025-10-23 17:37:54,784 - Running: python main.py --num-agents 4 --seed 1 --level example_tomato --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-23 20:15:44,399 - Running: python main.py --num-agents 4 --seed 1 --level example_tomato --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-23 20:31:23,413 - Running: python main.py --num-agents 4 --seed 1 --level example_tomato --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-23 20:32:23,512 - Running: python main.py --num-agents 4 --seed 1 --level example_tomato --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-23 20:32:27,490 - Planning completed for example_tomato in 3.00219780 seconds
+2025-10-23 21:01:12,824 - Running: python main.py --num-agents 4 --seed 1 --level example_tomato --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-23 21:01:17,261 - Planning completed for example_tomato in 3.40589350 seconds
+2025-10-23 21:50:13,118 - Running: python main.py --num-agents 4 --seed 1 --level example_tomato --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-23 21:50:17,435 - Planning completed for example_tomato in 3.29691840 seconds
+2025-10-23 21:50:35,854 - Agent agent-1: Steps taken: 38
+2025-10-23 21:50:35,855 - Agent agent-2: Steps taken: 38
+2025-10-23 21:50:35,855 - Agent agent-3: Steps taken: 38
+2025-10-23 21:50:35,855 - Agent agent-4: Steps taken: 38
+2025-10-23 21:50:35,855 - Time taken for example_tomato with plan and plan: 18.42 seconds
+2025-10-23 21:50:35,856 - Experiment success: True
+2025-10-23 21:50:35,856 - Deleted plan file: utils/plans/example_tomato_plan.txt
+2025-10-26 13:39:13,049 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 13:39:17,116 - Planning completed for large_tomato in 3.11638990 seconds
+2025-10-26 13:39:29,573 - Agent agent-1: Steps taken: 26
+2025-10-26 13:39:29,574 - Agent agent-2: Steps taken: 26
+2025-10-26 13:39:29,574 - Agent agent-3: Steps taken: 26
+2025-10-26 13:39:29,574 - Agent agent-4: Steps taken: 26
+2025-10-26 13:39:29,574 - Time taken for large_tomato with plan and plan: 12.45 seconds
+2025-10-26 13:39:29,574 - Experiment success: True
+2025-10-26 13:39:29,575 - Deleted plan file: utils/plans/large_tomato_plan.txt
+2025-10-26 13:41:31,111 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato_3 --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 13:42:52,236 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato_3 --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 13:42:55,641 - Planning completed for large_tomato_3 in 2.50934720 seconds
+2025-10-26 13:43:08,095 - Agent agent-1: Steps taken: 26
+2025-10-26 13:43:08,096 - Agent agent-2: Steps taken: 26
+2025-10-26 13:43:08,096 - Agent agent-3: Steps taken: 26
+2025-10-26 13:43:08,096 - Agent agent-4: Steps taken: 26
+2025-10-26 13:43:08,096 - Time taken for large_tomato_3 with plan and plan: 12.45 seconds
+2025-10-26 13:43:08,097 - Experiment success: True
+2025-10-26 13:43:08,097 - Deleted plan file: utils/plans/large_tomato_3_plan.txt
+2025-10-26 13:44:14,081 - Running: python main.py --num-agents 3 --seed 1 --level large_tomato_3 --model1 plan --model2 plan --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 13:44:17,485 - Planning completed for large_tomato_3 in 2.50807970 seconds
+2025-10-26 13:44:29,860 - Agent agent-1: Steps taken: 26
+2025-10-26 13:44:29,861 - Agent agent-2: Steps taken: 26
+2025-10-26 13:44:29,861 - Agent agent-3: Steps taken: 26
+2025-10-26 13:44:29,861 - Time taken for large_tomato_3 with plan and plan: 12.37 seconds
+2025-10-26 13:44:29,861 - Experiment success: True
+2025-10-26 13:44:29,862 - Deleted plan file: utils/plans/large_tomato_3_plan.txt
+2025-10-26 13:48:07,198 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 13:52:25,151 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 13:53:33,225 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 13:56:07,714 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 13:59:18,431 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 14:03:23,600 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 14:04:13,325 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 14:07:32,489 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 14:07:38,536 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 14:08:28,629 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 14:11:25,386 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 14:12:01,467 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 14:14:16,065 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 14:17:18,915 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 14:19:24,695 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 14:20:10,218 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 14:22:31,271 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 14:23:24,968 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 14:23:31,312 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 14:27:12,734 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 14:29:27,038 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 14:31:08,878 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 14:31:40,590 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 14:32:45,303 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 14:33:40,090 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 14:33:57,906 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 14:34:17,095 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 14:34:33,861 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 14:36:51,355 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 15:03:16,750 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 15:04:44,479 - Agents succeeded after 5247 steps.
+2025-10-26 15:04:44,479 - Agent agent-1: Steps taken: 10000
+2025-10-26 15:04:44,479 - Agents succeeded after 0 steps.
+2025-10-26 15:04:44,479 - Agent agent-2: Steps taken: 0
+2025-10-26 15:04:44,479 - Agents succeeded after 0 steps.
+2025-10-26 15:04:44,479 - Agent agent-3: Steps taken: 0
+2025-10-26 15:04:44,479 - Agents succeeded after 0 steps.
+2025-10-26 15:04:44,479 - Agent agent-4: Steps taken: 0
+2025-10-26 15:04:44,479 - Time taken for large_tomato with rl and rl: 86.89 seconds
+2025-10-26 15:04:44,480 - Experiment success: True
+2025-10-26 15:13:46,543 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 15:15:15,692 - Agents succeeded after 5247 steps.
+2025-10-26 15:15:15,692 - Agent agent-1: Steps taken: 10000
+2025-10-26 15:15:15,692 - Agents succeeded after 0 steps.
+2025-10-26 15:15:15,692 - Agent agent-2: Steps taken: 0
+2025-10-26 15:15:15,692 - Agents succeeded after 0 steps.
+2025-10-26 15:15:15,692 - Agent agent-3: Steps taken: 0
+2025-10-26 15:15:15,692 - Agents succeeded after 0 steps.
+2025-10-26 15:15:15,692 - Agent agent-4: Steps taken: 0
+2025-10-26 15:15:15,692 - Time taken for large_tomato with rl and rl: 88.32 seconds
+2025-10-26 15:15:15,692 - Experiment success: True
+2025-10-26 15:25:28,328 - Running: python main.py --num-agents 4 --seed 1 --level large_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
+2025-10-26 15:26:57,018 - Agents succeeded after 5247 steps.
+2025-10-26 15:26:57,018 - Agent agent-1: Steps taken: 10000
+2025-10-26 15:26:57,018 - Agents succeeded after 0 steps.
+2025-10-26 15:26:57,018 - Agent agent-2: Steps taken: 0
+2025-10-26 15:26:57,018 - Agents succeeded after 0 steps.
+2025-10-26 15:26:57,018 - Agent agent-3: Steps taken: 0
+2025-10-26 15:26:57,018 - Agents succeeded after 0 steps.
+2025-10-26 15:26:57,018 - Agent agent-4: Steps taken: 0
+2025-10-26 15:26:57,018 - Time taken for large_tomato with rl and rl: 87.86 seconds
+2025-10-26 15:26:57,018 - Experiment success: True

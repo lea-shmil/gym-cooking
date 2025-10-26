@@ -2,9 +2,7 @@ import json
 import numpy as np
 from gym import Wrapper
 from gym.spaces import Box, MultiDiscrete
-from gym_cooking.utils.agent import AgentRepr
-import os
-
+from gym_cooking.utils.pddl_problem_generator import text_map_to_vector
 
 action_mapping = {
     0: (0, -1),  # Move up
@@ -14,34 +12,17 @@ action_mapping = {
     4: (0, 0),  # No-op
 }
 
-pddl_name = {
-    1: 't1',
-    2: 'l1',
-    3: 'p1',
-    4: 'p2',
-}
-
-# Check destination tile type
+# 0=Counter, 1=Floor, 2=Cutboard, 3=Delivery Spot
 tile_type = {
-    3: "counter",
-    4: "floor",
-    5: "cutboard",
-    6: "delivery",
+    0: "counter",
+    1: "floor",
+    2: "cutboard",
+    3: "delivery",
+    # The rest are included for compatibility but only 0-3 should be used for grid tiles
     7: "tomato",
     8: "lettuce",
     9: "plate"
 }
-
-
-world_object_map = {
-    'Counter': 3,
-    'Floor': 4,
-    'Cutboard': 5,
-    'Delivery': 6,
-    'Tomato': 7,
-    'Lettuce': 8,
-    'Plate': 9}
-
 
 AGENT_PROPERTIES = 3
 OBJECT_PROPERTIES = 7
@@ -50,17 +31,13 @@ OBJECT_PROPERTIES = 7
 class OvercookedRLWrapper(Wrapper):
     def __init__(self, env):
         super().__init__(env)
-
-        grid_size = env.world.width * env.world.height
-        objects = [obj[1] for obj in self.world.objects.items() if obj[0] in ["Tomato", "Lettuce", "Plate"]]
-        object_size = sum(len(obj) for obj in objects)  # Calculate the size of the object representation
-        vector_length = grid_size + AGENT_PROPERTIES * len(self.sim_agents) + object_size * OBJECT_PROPERTIES
-        # Each agent has 3 attributes: x, y, id
-        #  each object statuses (itemname, tomato, lettuce, plate, chopped, x, y)
-        self.observation_space = Box(low=0, high=255, shape=(vector_length,), dtype=np.uint8)
-        self.action_space = MultiDiscrete([5, 5])
+        self.map_file = rf"utils\levels\{self.env.arglist.level}.txt"
+        self.vector, width, height, num_agents, num_objects = text_map_to_vector(self.map_file,
+                                                                                 self.env.arglist.num_agents)
+        self.observation_space = Box(low=0, high=255, shape=(len(self.vector),), dtype=np.uint8)
+        action_vec = [5] * num_agents  # 5 actions per agent
+        self.action_space = MultiDiscrete(action_vec)  # MultiDiscrete action space for 1-4 agents
         self.log_file = "env_log.txt"  # File to log states and actions
-        self.vector = self._process_observation(self.env.get_repr(), self.env.world.get_object_list())
         self.last_action_dict = None
         self.success = False
         self.steps_to_success = 0
@@ -69,27 +46,26 @@ class OvercookedRLWrapper(Wrapper):
         with open(self.log_file, "w") as log:
             log.write("")
 
-
-
     def reset(self):
         # Call the original environment's reset method
         steps = self.steps_to_success
-        obs = self.env.reset()
+        self.env.reset()
         self.steps_to_success = steps
-        self.vector = self._process_observation(self.env.get_repr(), self.env.world.get_object_list())
+        self.vector, width, height, num_agents, num_objects = text_map_to_vector(self.map_file,
+                                                                                 self.env.arglist.num_agents)
         return self.vector
 
     def step(self, action_arr):
-
-        # Call the original environment's step method
+        #  Call the original environment's step
         action_dict = {}
-        action_dict["agent-1"] = action_mapping[action_arr[0]]
-        action_dict["agent-2"] = action_mapping[action_arr[1]]
-
+        #  actions per number of agents
+        for i, action in enumerate(action_arr):
+            action_dict[f"agent-{i+1}"] = action_mapping[action]
         self.last_action_dict = action_dict
+
         with open(self.log_file, "a") as log:
             log.write("State:\n")
-            log.write(np.array2string(self.vector) + "\n")  # Write the state as a raw array
+            log.write(np.array2string(np.array(self.vector)) + "\n")  # Write the state as a raw array
 
         with open(self.log_file, "a") as log:
             log.write("Actions:\n")
@@ -110,150 +86,188 @@ class OvercookedRLWrapper(Wrapper):
 
         return self.vector, reward, done, info
 
-    def _process_observation(self, obs_repr, world_objects):
-        # Dynamically calculate vector length
-        grid_size = self.env.world.width * self.env.world.height
-        moving_objects, static_objects = [], []  # Separate lists for moving and static objects
-        for obj in world_objects:
-            if obj.name in ['Counter', 'Floor', 'Cutboard', 'Delivery']:
-                static_objects.append(obj)
-            else:
-                moving_objects.append(obj)
-
-        vector_length = grid_size + len(self.sim_agents) * AGENT_PROPERTIES + len(moving_objects) * OBJECT_PROPERTIES
-
-        # Initialize the vector
-        vector = np.zeros(vector_length, dtype=np.uint8)
-
-        # Step 1: Encode static world
-        for obj in static_objects:
-            x, y = obj.location
-            index = x * self.env.world.width + y
-            vector[index] = world_object_map.get(obj.name, -1)  # Use the mapping to encode the object type
-
-        # Step 2: Encode only agents
-        offset = grid_size
-        for obj_group in obs_repr:
-            if isinstance(obj_group, AgentRepr):
-                x, y = obj_group.location
-                vector[offset] = x  # X-coordinate
-                vector[offset + 1] = y  # Y-coordinate
-                if obj_group.name == 'agent-1':
-                    vector[offset + 2] = 1
-                else:
-                    vector[offset + 2] = 2
-                offset += AGENT_PROPERTIES
-
-        plate_flag = False
-        # Step 3: Encode moving objects
-        for obj in moving_objects:
-            x, y = obj.location
-            if obj.name == 'Tomato':
-                vector[offset] = 1
-                vector[offset + 1] = 1
-            elif obj.name == 'Lettuce':
-                vector[offset] = 2
-                vector[offset + 2] = 1
-            elif obj.name == 'Plate' and not plate_flag:
-                vector[offset] = 3
-                vector[offset + 3] = 1
-                plate_flag = True
-            else:  # second plate
-                vector[offset] = 4
-                vector[offset + 3] = 2
-            vector[offset + 5] = x
-            vector[offset + 6] = y
-            offset += OBJECT_PROPERTIES
-        return vector
-
     def get_parameters(self, f, action_dict, width, height):
-        offset = width * height
-        object_offset = offset + AGENT_PROPERTIES * len(action_dict)  # Start after the grid and agent properties
-        agent_keys = ["agent-1", "agent-2"]
+        """
+        Translates agent actions and the current state vector into PDDL operators,
+        and updates the state vector based on the action result.
+
+        Args:
+            self: The parent class instance.
+            f: The file stream to write PDDL actions to.
+            action_dict: Dictionary mapping agent keys (e.g., 'agent-1') to [dx, dy] actions.
+            width: Width of the world grid.
+            height: Height of the world grid.
+        """
+        # 1. Initialization and Dynamic Agent/Object Count
+        grid_size = width * height
+        num_agents = len(action_dict)
+        agent_start_offset = grid_size
+        object_start_offset = grid_size + AGENT_PROPERTIES * num_agents
+        agent_keys = [f"agent-{i + 1}" for i in range(num_agents)]
         actions = []
+        num_objects = (len(self.vector) - object_start_offset) // OBJECT_PROPERTIES
 
+        # 2. Iterate through each agent dynamically ('a' is the 0-based index: 0, 1, 2, ...)
         for a, agent_key in enumerate(agent_keys):
-            x_start = self.vector[offset]
-            y_start = self.vector[offset + 1]
-            start_loc = f"x{x_start}y{y_start}"
-            x_end = self.vector[offset] + action_dict[agent_key][0]
-            y_end = self.vector[offset + 1] + action_dict[agent_key][1]
-            end_loc = f"x{x_end}y{y_end}"
-            OBJECTS_AT = 5
-            dest = self.vector[x_end * width + y_end]
-            dest_tile = tile_type.get(dest, "unknown")
-            object_dest = -1
-            object_held = -1
-            PLATE = 2
-            CHOP = 1
-            for i in range(object_offset + OBJECTS_AT, len(self.vector), OBJECT_PROPERTIES):
-                if self.vector[i] == x_start and self.vector[i + 1] == y_start and self.vector[i - OBJECTS_AT] \
-                        in pddl_name:
-                    object_held = i
-                if self.vector[i] == x_end and self.vector[i + 1] == y_end and self.vector[i - OBJECTS_AT] in pddl_name:
-                    object_dest = i
-                i += OBJECT_PROPERTIES  # Move to the next object in the vector
-            action = ""
+            current_agent_offset = agent_start_offset + (a * AGENT_PROPERTIES)
 
-            # Floor and no other agent blocking
-            if dest_tile == "floor" and x_end != self.vector[offset + 3 - a * 6] and y_end != self.vector[
-                offset + 3 + 1 - a * 6]:
-                action = "move"
-                actions.append(f"({action} a{a + 1} {start_loc} {end_loc})")
-                self.vector[offset] = x_end
-                self.vector[offset + 1] = y_end
-                if object_held != -1:  # If the agent is holding an object, update its position
-                    self.vector[object_held] = x_end
-                    self.vector[object_held + 1] = y_end
-            # need to check if there is an object location in dests location currently
-            elif object_dest != -1 and object_held == -1:
-                action = "pickup"
-                item = pddl_name[self.vector[object_dest - OBJECTS_AT]]
-                # Remove the object from the destination tile
-                self.vector[object_dest] = x_start
-                self.vector[object_dest + 1] = y_start
-            # utboard need to check if agent is holding non plate non chopped object and that chopping board is not occuppied by an object
-            elif dest_tile == "cutboard" and object_dest == -1 and object_held != -1 and self.vector[
-                object_held - CHOP] == 0 and self.vector[object_held - PLATE] == 0:
-                action = "chop"
-                item = pddl_name[self.vector[object_held - OBJECTS_AT]]
-                self.vector[object_held - 1] = 1  # Mark the object as chopped
-            # Delivery need to check if agent is holding a plate with a chopped object
-            elif dest_tile == "deliver" and object_held != -1 and self.vector[object_held - PLATE] != 0 and self.vector[
-                object_held - CHOP] == 1:
-                action = "deliver"
-                item = pddl_name[self.vector[object_held - OBJECTS_AT]]
-                self.vector[object_held] = -1
-                self.vector[object_held + 1] = -1
-            # need to check if agent is holding something and counter is empty or its a chopping board and agent is holding a plate or a chopped object
-            elif object_dest == -1 and object_held != -1 and (
-                    dest_tile == "counter" or (dest_tile == "cutboard" and self.vector[object_held - CHOP] == 1)):
-                action = "put-down"
-                item = pddl_name[self.vector[object_held - OBJECTS_AT]]
-                self.vector[object_held] = x_end
-                self.vector[object_held + 1] = y_end
-            # merge plate i am holding the merged result
-            elif object_held != -1 and object_dest != -1 and \
-                    ((self.vector[object_held - PLATE] != 0 and self.vector[object_dest - CHOP] == 1) or
-                     (self.vector[object_held - CHOP] == 1 and self.vector[object_dest - PLATE] != 0)):
-                action = "merge"
-                item = pddl_name[self.vector[object_held - OBJECTS_AT]]
-                self.vector[object_dest] = -1
-                self.vector[object_dest + 1] = -1
-                self.vector[object_held - PLATE] = max(self.vector[object_held - PLATE],
-                                                       self.vector[object_dest - PLATE])
-                self.vector[object_held - CHOP] = max(self.vector[object_held - CHOP], self.vector[object_dest - CHOP])
-                self.vector[object_held - 3] = max(self.vector[object_held - 3],
-                                                   self.vector[object_dest - 3])  # lettuce
-                self.vector[object_held - 4] = max(self.vector[object_held - 4], self.vector[object_dest - 4])  # tomato
-            else:
-                actions.append(f"(nop )")
+            # 2.1 Read current state
+            # Note: self.vector[current_agent_offset] is the agent ID (0, 1, 2, ...)
+            x_start = int(self.vector[current_agent_offset + 1])
+            y_start = int(self.vector[current_agent_offset + 2])
+            start_loc = f"x{x_start}y{y_start}"
+
+            # 2.2 Calculate destination state
+            dx, dy = action_dict[agent_key]
+            x_end = x_start + dx
+            y_end = y_start + dy
+            end_loc = f"x{x_end}y{y_end}"
+
+            # Bounds check
+            if not (0 <= x_end < width and 0 <= y_end < height):
+                actions.append(f"(nop a{a+1} )")
                 continue
 
-            if dest_tile != "floor":
-                actions.append(f"({action} a{a + 1} {start_loc} {end_loc} {item})")
-            offset += 3
-        f.write(" ".join(actions) + ")\n")  # Close the operators section
+            # Calculate destination tile properties
+            dest_index = y_end * width + x_end
+            dest = self.vector[dest_index]
+            dest_tile = tile_type.get(dest, "unknown")
 
+            # 2.3 Object Search
+            object_dest_index = -1  # Vector index of the object at the destination tile
+            object_held_index = -1  # Vector index of the object currently held by the agent
 
+            for i in range(num_objects):
+                # i_start is the index of the current object's ID in the vector
+                i_start = object_start_offset + (i * OBJECT_PROPERTIES)
 
+                # The X and Y coordinates of the object are at i_start + 1 and i_start + 2
+                obj_x = int(self.vector[i_start + 1])
+                obj_y = int(self.vector[i_start + 2])
+
+                if obj_x == x_start and obj_y == y_start:
+                    object_held_index = i_start
+
+                if obj_x == x_end and obj_y == y_end:
+                    object_dest_index = i_start
+
+            # --- PDDL Action Logic ---
+
+            # Note: Indexes are relative to the object's ID (index 0 of the object block)
+            # 3: is_tomato, 4: is_lettuce, 5: is_plate, 6: is_cut
+            is_plate_idx = 5
+            is_cut_idx = 6
+
+            # --- Collision Logic ---
+            is_blocked_by_other_agent = False
+            for j in range(num_agents):
+                if a == j:
+                    continue  # Skip checking against self
+            # Calculate the offset for the other agent 'j'
+            other_agent_offset = agent_start_offset + (j * AGENT_PROPERTIES)
+            other_x = int(self.vector[other_agent_offset + 1])
+            other_y = int(self.vector[other_agent_offset + 2])
+
+            if x_end == other_x and y_end == other_y:
+                is_blocked_by_other_agent = True
+                break
+
+            # 3. Move Action
+            if dest_tile == "floor" and not is_blocked_by_other_agent:
+                action = "move"
+                actions.append(f"({action} a{a + 1} {start_loc} {end_loc})")
+
+                self.vector[current_agent_offset + 1] = x_end
+                self.vector[current_agent_offset + 2] = y_end
+
+                if object_held_index != -1:
+                    self.vector[object_held_index + 1] = x_end
+                    self.vector[object_held_index + 2] = y_end
+
+            # 4. Pickup Action
+            elif object_dest_index != -1 and object_held_index == -1:
+                action = "pickup"
+                item_id = int(self.vector[object_dest_index])
+                item = f"o{item_id}"
+
+                actions.append(f"({action} a{a + 1} {end_loc} {item})")
+
+                self.vector[object_dest_index + 1] = x_end
+                self.vector[object_dest_index + 2] = y_end
+
+            # 5. Chop Action
+            elif (dest_tile == "cutboard" and object_dest_index == -1 and object_held_index != -1 and
+                  int(self.vector[object_held_index + is_cut_idx]) == 0 and
+                  int(self.vector[object_held_index + is_plate_idx]) == 0):
+                action = "chop"
+                item_id = int(self.vector[object_held_index])
+                item = f"o{item_id}"
+                actions.append(f"({action} a{a + 1} {end_loc} {item})")
+
+                self.vector[object_held_index + is_cut_idx] = 1
+
+                # 6. Delivery Action
+            elif (dest_tile == "delivery" and object_held_index != -1 and
+                  int(self.vector[object_held_index + is_plate_idx]) != 0 and
+                  int(self.vector[object_held_index + is_cut_idx]) == 1):
+                action = "deliver"
+                item_id = int(self.vector[object_held_index])
+                item = f"o{item_id}"
+                actions.append(f"({action} a{a + 1} {end_loc} {item})")
+
+                self.vector[object_held_index + 1] = -1
+                self.vector[object_held_index + 2] = -1
+
+            # 7. Put Down Action
+            elif object_dest_index == -1 and object_held_index != -1:
+                #  split put-down into 3 actions based on destination tile and object properties
+                if dest_tile == "counter":
+                    action = "put-down-unchopped-veggie"
+                elif dest_tile == "cutboard" and int(self.vector[object_held_index + is_cut_idx]) == 1:
+                    action = "put-down-chopped-veggie"
+                elif dest_tile == "cutboard" and int(self.vector[object_held_index + is_plate_idx]) != 0:
+                    action = "put-down-plate"
+
+                item_id = int(self.vector[object_held_index])
+                item = f"o{item_id}"
+                actions.append(f"({action} a{a + 1} {end_loc} {item})")
+                self.vector[object_held_index + 1] = x_end
+                self.vector[object_held_index + 2] = y_end
+
+            # 8. Merge Action
+            elif object_held_index != -1 and object_dest_index != -1 and \
+                    ((int(self.vector[object_held_index + is_plate_idx]) != 0 and
+                      int(self.vector[object_dest_index + is_cut_idx]) == 1) or
+                     (int(self.vector[object_held_index + is_cut_idx]) == 1 and
+                      int(self.vector[object_dest_index + is_plate_idx]) != 0)):
+
+                action = "merge"
+                item_id_held = int(self.vector[object_held_index])
+                item = f"o{item_id_held}"
+
+                item_id_dest = int(self.vector[object_dest_index])
+                item_dest = f"o{item_id_dest}"
+
+                actions.append(f"({action} a{a + 1} {end_loc} {item} {item_dest})")
+
+                # Merge properties onto the held object
+                is_tomato_idx = 3
+                is_lettuce_idx = 4
+                self.vector[object_held_index + is_plate_idx] = (
+                    max(self.vector[object_held_index + is_plate_idx], self.vector[object_dest_index + is_plate_idx]))
+                self.vector[object_held_index + is_cut_idx] =\
+                    max(self.vector[object_held_index + is_cut_idx], self.vector[object_dest_index + is_cut_idx])
+                self.vector[object_held_index + is_tomato_idx] =\
+                    max(self.vector[object_held_index + is_tomato_idx], self.vector[object_dest_index + is_tomato_idx])
+                self.vector[object_held_index + is_lettuce_idx] = (max(self.vector[object_held_index + is_lettuce_idx],
+                                                                       self.vector[object_dest_index + is_lettuce_idx]))
+                # Invalidate/Remove the object at the destination tile
+                self.vector[object_dest_index + 1] = -1
+                self.vector[object_dest_index + 2] = -1
+
+            # 9. Default Nop
+            else:
+                actions.append(f"(nop a{a+1} )")
+                continue
+
+        f.write(" ".join(actions) + "\n")

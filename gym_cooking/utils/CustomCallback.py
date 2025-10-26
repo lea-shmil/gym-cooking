@@ -1,8 +1,8 @@
 from stable_baselines3.common.callbacks import BaseCallback
 import time
 import os
-
-from gym_cooking.utils.pddl_problem_generator import get_state
+from gym_cooking.utils.pddl_problem_generator import get_state, text_map_to_vector
+from gym_cooking.utils.pddl_problem_generator import state_to_pddl
 
 
 class TrajectoryCallback(BaseCallback):
@@ -18,9 +18,12 @@ class TrajectoryCallback(BaseCallback):
 
     def _on_training_start(self) -> None:
         # initialize pddl
-        pddl_file_path = rf"C:\Users\Administrator\Documents\GitHub\gym-cooking\gym_cooking\utils\pddls\{self.env.arglist.level}.pddl"
+        level_name = self.env.arglist.level
+        pddl_file_path = rf"utils\pddls\{level_name}.pddl"
+        map_file = rf"utils\levels\{level_name}.txt"
 
-        self.env.state_to_pddl(self.env.vector, self.env.arglist.level, self.env.world.width, self.env.world.height, pddl_file_path)
+        state_vector, width, height, num_agents, num_objects = text_map_to_vector(map_file, self.env.arglist.num_agents)
+        state_to_pddl(state_vector, width, height, num_agents, num_objects, level_name, pddl_file_path)
 
         """Initialize the first trajectory file with a timestamp."""
         timestamp = time.strftime("%Y%m%d-%H%M%S")
@@ -30,7 +33,8 @@ class TrajectoryCallback(BaseCallback):
         os.makedirs(self.trajectory_dir, exist_ok=True)
         with open(self.current_trajectory_file, "w") as f:
             f.write("((:init  ")
-            get_state(f, self.env.vector, self.env.world.width, self.env.world.height)
+            get_state(f, state_vector, width, height, num_agents, num_objects)
+
 
     def _on_step(self) -> bool:
         """Write actions and states to the trajectory file."""
@@ -39,12 +43,16 @@ class TrajectoryCallback(BaseCallback):
         if hasattr(self.env, "last_action_dict"):
             action_dict = self.env.last_action_dict
 
+        map_file = rf"utils\levels\{self.env.arglist.level}.txt"
+        state_vector, width, height, num_agents, num_objects = text_map_to_vector(map_file, self.env.arglist.num_agents)
+
         with open(self.current_trajectory_file, "a") as f:
             if not self.success_logged:
                 f.write("(operators: ")
                 self.env.get_parameters(f, action_dict, self.env.world.width, self.env.world.height)
                 f.write("(:state  ")
-                get_state(f, self.env.vector, self.env.world.width, self.env.world.height)
+                get_state(f, state_vector, width, height, num_agents, num_objects)
+
         # Check for success and create a new file if needed
         if hasattr(self.env, "success") and self.env.success and not self.success_logged:
             with open(self.current_trajectory_file, "a") as f:
@@ -59,7 +67,7 @@ class TrajectoryCallback(BaseCallback):
             )
             with open(self.current_trajectory_file, "w") as f:
                 f.write("((:init  ")
-                get_state(f, self.env.vector, self.env.world.width, self.env.world.height)
+                get_state(f, state_vector, width, height, num_agents, num_objects)
             self.env.reset()  # Reset the environment but keep training
 
             print("Saving success before PPO reset.")

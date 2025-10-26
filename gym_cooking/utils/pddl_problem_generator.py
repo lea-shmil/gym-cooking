@@ -1,26 +1,11 @@
 import os
 
-# Define character mappings for environment features and objects
-TILE_MAP = {
-    '-': {'type': 'counter'},
-    ' ': {'type': 'floor'},
-    '/': {'type': 'chopping_board'},
-    '*': {'type': 'delivery_spot'}
-}
-
 # New integer encoding for the map grid features (per coordinate)
 TILE_ENCODING = {
     '-': 0,  # Counter
     ' ': 1,  # Floor
     '/': 2,  # Chopping Board
     '*': 3   # Delivery Spot
-}
-
-# Object definitions (assuming 'is_cut' starts at 0 for initial state)
-OBJECT_MAP = {
-    'p': {'name': 'plate', 'is_tomato': 0, 'is_lettuce': 0, 'is_plate': 1, 'is_cut': 0},
-    't': {'name': 'tomato', 'is_tomato': 1, 'is_lettuce': 0, 'is_plate': 0, 'is_cut': 0},
-    'l': {'name': 'lettuce', 'is_tomato': 0, 'is_lettuce': 1, 'is_plate': 0, 'is_cut': 0}
 }
 
 # PDDL Predicate mapping for the new grid encoding
@@ -142,8 +127,6 @@ def text_map_to_vector(map_file_path, num_agents_to_use):
 
     # --- 4. Construct Vector: Agent Features (TRIMMED) ---
 
-    # This is the line that caused the error previously (if agent_coords_all was a set)
-    # The fix is ensuring agent_coords_all is a list, which it is now.
     agents_elements_to_keep = num_agents_to_use * AGENT_PROPERTIES
     agent_coords_final = agent_coords_all[:agents_elements_to_keep]
     vector.extend(agent_coords_final)
@@ -335,14 +318,14 @@ def get_state(pddl_file, state, world_width, world_height, agents, objects):
 
         offset += OBJECT_PROPERTIES
 
-    pddl_file.write(")\n\n")
+    pddl_file.write(")\n")
 
 
 if __name__ == '__main__':
     # Example usage
-    map_file = r'levels\example_tomato.txt'  # Path to your map file
-    pddl_output_file = r'pddls\example_tomato.pddl'  # Path to save the PDDL file
-    level_name = 'example_tomato'  # Example level name
+    map_file = r'levels\large_tomato.txt'  # Path to your map file
+    pddl_output_file = r'pddls\large_tomato_3.pddl'  # Path to save the PDDL file
+    level_name = 'large_tomato_3'  # Example level name
 
-    state_vector, width, height, num_agents, num_objects = text_map_to_vector(map_file, 4)
+    state_vector, width, height, num_agents, num_objects = text_map_to_vector(map_file, 3)
     state_to_pddl(state_vector, width, height, num_agents, num_objects, level_name, pddl_output_file)

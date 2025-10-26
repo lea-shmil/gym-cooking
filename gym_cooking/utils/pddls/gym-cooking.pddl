@@ -190,7 +190,7 @@
 ; objects can be put on chopping board
 ; can put down any veggieOrPlate
 
-(:action put-down-chopped-veggie-on-cutting-board
+(:action put-down-chopped-veggie
   :parameters (?a - agent ?agent_loc - cell ?target_loc - cell ?obj - veggieOrPlate)
   :precondition (and
     (agent_at ?a ?agent_loc)
