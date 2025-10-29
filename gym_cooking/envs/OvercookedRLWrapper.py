@@ -60,7 +60,7 @@ class OvercookedRLWrapper(Wrapper):
         action_dict = {}
         #  actions per number of agents
         for i, action in enumerate(action_arr):
-            action_dict[f"agent-{i+1}"] = action_mapping[action]
+            action_dict[f"agent-{i + 1}"] = action_mapping[action]
         self.last_action_dict = action_dict
 
         with open(self.log_file, "a") as log:
@@ -125,7 +125,7 @@ class OvercookedRLWrapper(Wrapper):
 
             # Bounds check
             if not (0 <= x_end < width and 0 <= y_end < height):
-                actions.append(f"(nop a{a+1} )")
+                actions.append(f"(nop a{a + 1} )")
                 continue
 
             # Calculate destination tile properties
@@ -192,8 +192,9 @@ class OvercookedRLWrapper(Wrapper):
 
                 actions.append(f"({action} a{a + 1} {end_loc} {item})")
 
-                self.vector[object_dest_index + 1] = x_end
-                self.vector[object_dest_index + 2] = y_end
+                self.vector[object_dest_index + 1] = x_start
+                self.vector[object_dest_index + 2] = y_start
+
 
             # 5. Chop Action
             elif (dest_tile == "cutboard" and object_dest_index == -1 and object_held_index != -1 and
@@ -221,12 +222,16 @@ class OvercookedRLWrapper(Wrapper):
             # 7. Put Down Action
             elif object_dest_index == -1 and object_held_index != -1:
                 #  split put-down into 3 actions based on destination tile and object properties
-                if dest_tile == "counter":
+                if dest_tile == "counter" and int(self.vector[object_held_index + is_cut_idx]) == 0:
                     action = "put-down-unchopped-veggie"
-                elif dest_tile == "cutboard" and int(self.vector[object_held_index + is_cut_idx]) == 1:
+                elif (dest_tile == "cutboard" or dest_tile == "counter") \
+                        and int(self.vector[object_held_index + is_cut_idx]) == 1:
                     action = "put-down-chopped-veggie"
-                elif dest_tile == "cutboard" and int(self.vector[object_held_index + is_plate_idx]) != 0:
+                elif (dest_tile == "cutboard" or dest_tile == "counter") \
+                        and int(self.vector[object_held_index + is_plate_idx]) != 0:
                     action = "put-down-plate"
+                else:
+                    break
 
                 item_id = int(self.vector[object_held_index])
                 item = f"o{item_id}"
@@ -235,13 +240,32 @@ class OvercookedRLWrapper(Wrapper):
                 self.vector[object_held_index + 2] = y_end
 
             # 8. Merge Action
-            elif object_held_index != -1 and object_dest_index != -1 and \
-                    ((int(self.vector[object_held_index + is_plate_idx]) != 0 and
-                      int(self.vector[object_dest_index + is_cut_idx]) == 1) or
-                     (int(self.vector[object_held_index + is_cut_idx]) == 1 and
-                      int(self.vector[object_dest_index + is_plate_idx]) != 0)):
+            elif object_held_index != -1 and object_dest_index != -1:
+                # held is plate and not merged and dest is chopped and not merged
+                if int(self.vector[object_held_index + is_plate_idx]) != 0 and \
+                    int(self.vector[object_held_index + is_cut_idx]) == 0 and \
+                    int(self.vector[object_dest_index + is_cut_idx]) == 1 and \
+                    int(self.vector[object_dest_index + is_plate_idx]) == 0:
 
-                action = "merge"
+                    action = "merge-plate"
+                # held is chopped and not merged and dest is plate and not merged
+                elif int(self.vector[object_held_index + is_cut_idx]) == 1 \
+                        and int(self.vector[object_dest_index + is_plate_idx]) != 0 \
+                        and int(self.vector[object_held_index + is_plate_idx]) == 0 \
+                        and int(self.vector[object_dest_index + is_cut_idx]) == 0: \
+
+                    action = "merge-plate-on-counter"
+                # both plates not merged
+                elif int(self.vector[object_held_index + is_cut_idx]) == 1 \
+                        and int(self.vector[object_dest_index + is_cut_idx]) == 1 \
+                        and int(self.vector[object_held_index + is_plate_idx]) == 0 \
+                        and int(self.vector[object_dest_index + is_plate_idx]) == 0:
+
+                    action = "merge-no-plate"
+
+                else:
+                    break
+
                 item_id_held = int(self.vector[object_held_index])
                 item = f"o{item_id_held}"
 
@@ -255,19 +279,22 @@ class OvercookedRLWrapper(Wrapper):
                 is_lettuce_idx = 4
                 self.vector[object_held_index + is_plate_idx] = (
                     max(self.vector[object_held_index + is_plate_idx], self.vector[object_dest_index + is_plate_idx]))
-                self.vector[object_held_index + is_cut_idx] =\
+                self.vector[object_held_index + is_cut_idx] = \
                     max(self.vector[object_held_index + is_cut_idx], self.vector[object_dest_index + is_cut_idx])
-                self.vector[object_held_index + is_tomato_idx] =\
+                self.vector[object_held_index + is_tomato_idx] = \
                     max(self.vector[object_held_index + is_tomato_idx], self.vector[object_dest_index + is_tomato_idx])
                 self.vector[object_held_index + is_lettuce_idx] = (max(self.vector[object_held_index + is_lettuce_idx],
                                                                        self.vector[object_dest_index + is_lettuce_idx]))
                 # Invalidate/Remove the object at the destination tile
                 self.vector[object_dest_index + 1] = -1
                 self.vector[object_dest_index + 2] = -1
+                self.vector[object_dest_index + is_plate_idx] = 0
+                self.vector[object_dest_index + is_cut_idx] = 0
+
 
             # 9. Default Nop
             else:
-                actions.append(f"(nop a{a+1} )")
+                actions.append(f"(nop a{a + 1} )")
                 continue
 
-        f.write(" ".join(actions) + "\n")
+        f.write(" ".join(actions) + ")\n")

@@ -204,10 +204,11 @@ def main_loop(arglist):
     elapsed_time = agent_end_time - agent_start_time
 
     # Log metrics
-    for agent in real_agents:
-        if isinstance(agent, RLAgent):
-            logger.info(f"Agents succeeded after {agent.steps_to_success} steps.")
-        logger.info(f"Agent {agent.name}: Steps taken: {agent.steps_taken}")
+
+    if isinstance(real_agents[0], RLAgent) and real_agents[0].successful:
+        logger.info(f"Agent {real_agents[0].name}: Steps taken: {real_agents[0].steps_to_success}")
+    else:
+        logger.info(f"Agent {real_agents[0].name}: Steps taken: {real_agents[0].steps_taken}")
     logger.info(f"Time taken for {arglist.level} with {arglist.model1} and {arglist.model2}: {elapsed_time:.2f} seconds")
 
     # Log overall success

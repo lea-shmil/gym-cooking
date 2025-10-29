@@ -258,9 +258,9 @@ def get_state(pddl_file, state, world_width, world_height, agents, objects):
         # PDDL agent name: a1, a2...
         agent_name = f"a{i+1}"
 
-        pddl_file.write(f"    (agent_at {agent_name} x{agent_x}y{agent_y})\n")
-        pddl_file.write(f"    (holding_nothing {agent_name})\n")
-        pddl_file.write(f"    (occupied x{agent_x}y{agent_y})\n")
+        pddl_file.write(f"(agent_at {agent_name} x{agent_x}y{agent_y})")
+        pddl_file.write(f"(holding_nothing {agent_name})")
+        pddl_file.write(f"(occupied x{agent_x}y{agent_y})")
 
         offset += AGENT_PROPERTIES
         agent_locs[agent_name] = (agent_x, agent_y)
@@ -274,15 +274,15 @@ def get_state(pddl_file, state, world_width, world_height, agents, objects):
         predicate = GRID_PREDICATES.get(tile_encoding)
 
         if predicate:
-            pddl_file.write(f"    ({predicate} x{x}y{y})\n")
+            pddl_file.write(f"({predicate} x{x}y{y})")
 
         # Add adjacency predicates
         if x + 1 < world_width:
-            pddl_file.write(f"    (adjacent x{x}y{y} x{x + 1}y{y})\n")
-            pddl_file.write(f"    (adjacent x{x + 1}y{y} x{x}y{y})\n")
+            pddl_file.write(f"(adjacent x{x}y{y} x{x + 1}y{y})")
+            pddl_file.write(f"(adjacent x{x + 1}y{y} x{x}y{y})")
         if y + 1 < world_height:
-            pddl_file.write(f"    (adjacent x{x}y{y} x{x}y{y + 1})\n")
-            pddl_file.write(f"    (adjacent x{x}y{y + 1} x{x}y{y})\n")
+            pddl_file.write(f"(adjacent x{x}y{y} x{x}y{y + 1})")
+            pddl_file.write(f"(adjacent x{x}y{y + 1} x{x}y{y})")
 
     # 3. Add Object Predicates
     offset = grid_size + (agents * AGENT_PROPERTIES)
@@ -300,21 +300,21 @@ def get_state(pddl_file, state, world_width, world_height, agents, objects):
         # PDDL object name: o0, o1, o2...
         object_name = f"o{i}"
 
-        pddl_file.write(f"    (object_at {object_name} x{obj_x}y{obj_y})\n")
-        pddl_file.write(f"    (occupied x{obj_x}y{obj_y})\n")
+        pddl_file.write(f"(object_at {object_name} x{obj_x}y{obj_y})")
+        pddl_file.write(f"(occupied x{obj_x}y{obj_y})")
 
         # Define object type and state
 
         if is_tomato:
-            pddl_file.write(f"    (tomato {object_name})\n")
+            pddl_file.write(f"(tomato {object_name})")
         if is_lettuce:
-            pddl_file.write(f"    (lettuce {object_name})\n")
+            pddl_file.write(f"(lettuce {object_name})")
         if is_plate:
-            pddl_file.write(f"    (plate {object_name})\n")
+            pddl_file.write(f"(plate {object_name})")
         else:
-            pddl_file.write(f"    (not-plate {object_name})\n")
+            pddl_file.write(f"(not-plate {object_name})")
         if is_cut:
-            pddl_file.write(f"    (is_cut {object_name})\n")
+            pddl_file.write(f"(is_cut {object_name})")
 
         offset += OBJECT_PROPERTIES
 
