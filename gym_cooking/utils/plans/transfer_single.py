@@ -5,6 +5,7 @@
 from pddl_plus_parser.multi_agent import PlanConverter
 from pddl_plus_parser.lisp_parsers import DomainParser, ProblemParser
 import logging
+import os
 
 logging.root.setLevel(logging.ERROR)
 
@@ -19,25 +20,38 @@ console_handler.setFormatter(formatter)
 plan_converter_logger.addHandler(console_handler)
 
 
-def parallel_execution(
-    domain: str, problem: str, solution: str,  agent_names: list, suffix: str = ""
-) -> str:
-    """Transform a single-agent PDDL sloution file to a multi-agent PDDL sloution file.
+def parallel_execution(domain: str, problem: str, solution: str, agent_names: list, suffix: str = "") -> str:
+    """Transform a single-agent PDDL solution file to a multi-agent PDDL solution file."""
+    # Check if the domain file exists
+    if not os.path.exists(domain):
+        raise FileNotFoundError(f"Domain file not found: {domain}")
+    # Check if the problem file exists
+    if not os.path.exists(problem):
+        raise FileNotFoundError(f"Problem file not found: {problem}")
+    # Check if the solution file exists
+    if not os.path.exists(solution):
+        raise FileNotFoundError(f"Solution file not found: {solution}")
 
-    domain: str
-        The path of the PDDL domain file.
-    problem: str
-        The path of the PDDL problem file.
-    agent_types: list
-        List of all the agents names.
-    """
+    # Log the content of the domain file for debugging
+    with open(domain, "r") as domain_file:
+        domain_content = domain_file.read()
+        print(f"Domain file content:\n{domain_content}")
 
-    domain_parser = DomainParser(domain).parse_domain()
+    # Parse the domain and problem files
+    domain_parser = DomainParser(domain)
+    try:
+        parsed_domain = domain_parser.parse_domain()
+    except IndexError as e:
+        print("Error parsing the domain file. Please check the PDDL syntax.")
+        raise e
 
-    uproblem = ProblemParser(problem_path=problem, domain=domain_parser)
+    uproblem = ProblemParser(problem_path=problem, domain=parsed_domain)
 
-    plan_converter = PlanConverter(domain_parser)
-
+    # Convert the single-agent plan to a multi-agent plan
+    plan_converter = PlanConverter(parsed_domain)
+    print(solution)
+    print(agent_names)
+    print(uproblem.parse_problem())
     joint_actions = plan_converter.convert_plan(
         uproblem.parse_problem(), solution, agent_names
     )

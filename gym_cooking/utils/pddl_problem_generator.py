@@ -43,38 +43,97 @@ def text_map_to_vector(map_file_path, num_agents_to_use):
 
     with open(map_file_path, 'r') as f:
         content = f.read().strip().split('\n')
+        # --- 1. Parse Sections ---
+        agent_lines = []
 
+        # Find the separator line (usually a blank line or non-map line)
+        try:
+            goal_index = content.index(
+                next(line for line in content if not line.strip() or not (line[0] in TILE_ENCODING or
+                                                                          line[0].isalpha())))
+        except StopIteration:
+            raise ValueError("Could not determine map, goal, or agent sections in the file.")
+
+        # Map lines are before the goal
+        map_lines = [line.strip() for line in content[:goal_index] if line.strip()]
+
+        # Agent lines start after the goal
+        agent_start_index = goal_index + 2
+        for line in content[agent_start_index:]:
+            if line.strip():
+                try:
+                    # Agent lines contain two space-separated coordinates
+                    parts = [int(p) for p in line.strip().split()]
+                    if len(parts) == 2:
+                        agent_lines.append(parts)
+                except ValueError:
+                    # Stop when non-coordinate lines are hit (e.g., file end, or extra separators)
+                    break
     # --- 1. Parse Sections ---
-    agent_lines = []
+        # --- 1. Parse Sections (FIXED LOGIC for multi-line goals) ---
 
-    # Find the separator line (usually a blank line or non-map line)
-    try:
-        goal_index = content.index(next(line for line in content if not line.strip() or not (line[0] in TILE_ENCODING or
-                                                                                             line[0].isalpha())))
-    except StopIteration:
-        raise ValueError("Could not determine map, goal, or agent sections in the file.")
+        map_lines = []
+        agent_lines = []
 
-    # Map lines are before the goal
-    map_lines = [line.strip() for line in content[:goal_index] if line.strip()]
+        # 1a. Find the end of the map grid
+        map_end_index = 0
+        for i, line in enumerate(content):
+            line = line.strip()
+            if not line:
+                continue
 
-    # Agent lines start after the goal
-    agent_start_index = goal_index + 2
-    for line in content[agent_start_index:]:
-        if line.strip():
-            try:
-                # Agent lines contain two space-separated coordinates
-                parts = [int(p) for p in line.strip().split()]
-                if len(parts) == 2:
-                    agent_lines.append(parts)
-            except ValueError:
-                # Stop when non-coordinate lines are hit (e.g., file end, or extra separators)
+            # Heuristic: If the line starts with a digit, it's likely an agent coordinate,
+            # meaning the map and goal sections are finished.
+            if line and line[0].isdigit():
+                map_end_index = i
                 break
 
-    # Dimensions
-    world_height = len(map_lines)
-    if not world_height:
-        raise ValueError("Map is empty.")
-    world_width = len(map_lines[0])
+            # Ensure only map characters are included.
+            # This part requires TILE_ENCODING to contain all expected map characters.
+            is_map_line = all(c in TILE_ENCODING or c.isalpha() for c in line)
+
+            # If the line is map content, add it.
+            if is_map_line and (i == 0 or len(line) == len(map_lines[0])):
+                map_lines.append(line)
+            else:
+                # Reached the first line of goal/metadata (e.g., "SimpleTomato")
+                map_end_index = i
+                break
+
+        # Finalize map lines (removing any extra whitespace lines from the source)
+        map_lines = [line.strip() for line in map_lines if line.strip()]
+
+        # 1b. Find Agent Coordinates (starting after the map section)
+        # This iterates over the goal lines and stops when it finds the first two-integer line.
+
+        agent_start_checking_index = map_end_index
+
+        for line in content[agent_start_checking_index:]:
+            line = line.strip()
+            if not line:
+                continue
+
+            try:
+                # Agent lines contain two space-separated coordinates
+                parts = [int(p) for p in line.split()]
+                if len(parts) == 2:
+                    agent_lines.append(parts)
+                else:
+                    # If we hit a line with numbers but not two (after finding at least one agent), stop
+                    break
+            except ValueError:
+                # Continue (skip) lines that are not coordinates (like "SimpleTomato")
+                continue
+
+        if not agent_lines and num_agents_to_use > 0:
+            # You might want to log this instead of passing silently
+            pass
+
+            # Dimensions (Keep the original dimension check lines, they are correct)
+        world_height = len(map_lines)
+        if not world_height:
+            raise ValueError("Map is empty.")
+        world_width = len(map_lines[0])
 
     # --- 2. Extract Objects and Full Agent Coordinates ---
 
@@ -259,11 +318,20 @@ def get_state(pddl_file, state, world_width, world_height, agents, objects):
         agent_name = f"a{i+1}"
 
         pddl_file.write(f"(agent_at {agent_name} x{agent_x}y{agent_y})")
-        pddl_file.write(f"(holding_nothing {agent_name})")
-        pddl_file.write(f"(occupied x{agent_x}y{agent_y})")
 
         offset += AGENT_PROPERTIES
         agent_locs[agent_name] = (agent_x, agent_y)
+        holding_nothing = True
+        # check if there is an object in the same location, if not then holding_nothing:
+        for obj in range(grid_size + (agents * AGENT_PROPERTIES), grid_size + (agents * AGENT_PROPERTIES) +
+                                    (objects * OBJECT_PROPERTIES), OBJECT_PROPERTIES):
+            if int(state[obj + 1]) == agent_x and int(state[obj + 2]) == agent_y:
+                holding_nothing = False
+                break
+        if holding_nothing:
+            pddl_file.write(f"(holding_nothing {agent_name})")
+            # If the agent was holding something then the occupied will be written later
+            pddl_file.write(f"(occupied x{agent_x}y{agent_y})")
 
     # 2. Add Grid Predicates
     for i in range(grid_size):
@@ -314,7 +382,7 @@ def get_state(pddl_file, state, world_width, world_height, agents, objects):
         else:
             pddl_file.write(f"(not-plate {object_name})")
         if is_cut:
-            pddl_file.write(f"(is_cut {object_name})")
+            pddl_file.write(f"(chopped {object_name})")
 
         offset += OBJECT_PROPERTIES
 
@@ -322,10 +390,12 @@ def get_state(pddl_file, state, world_width, world_height, agents, objects):
 
 
 if __name__ == '__main__':
-    # Example usage
-    map_file = r'levels\large_tomato.txt'  # Path to your map file
-    pddl_output_file = r'pddls\large_tomato_3.pddl'  # Path to save the PDDL file
-    level_name = 'large_tomato_3'  # Example level name
 
-    state_vector, width, height, num_agents, num_objects = text_map_to_vector(map_file, 3)
-    state_to_pddl(state_vector, width, height, num_agents, num_objects, level_name, pddl_output_file)
+    for level in ['blocks_salad', 'blocks_salad_v2', 'blocks_tl', 'blocks_tl_v2', 'blocks_tomato', 'blocks_tomato_v2', 'credit-divider_salad', 'credit-divider_salad_v2', 'credit-divider_tl', 'credit-divider_tl_v2', 'credit-divider_tomato', 'credit-divider_tomato_v2', 'cubicle_salad', 'cubicle_salad_v2', 'cubicle_tl', 'cubicle_tl_v2', 'cubicle_tomato', 'cubicle_tomato_v2', 'full-divider_salad', 'full-divider_salad_v2', 'full-divider_tl', 'full-divider_tl_v2', 'full-divider_tomato', 'full-divider_tomato_v2', 'halfmap-divider_salad', 'halfmap-divider_salad_v2', 'halfmap-divider_tl', 'halfmap-divider_tl_v2', 'halfmap-divider_tomato', 'halfmap-divider_tomato_v2', 'large_tomato', 'large_tomato_3', 'open-divider_salad', 'open-divider_salad_v2', 'open-divider_tl', 'open-divider_tl_v2', 'open-divider_tomato', 'open-divider_tomato_v2', 'partial-divider_salad', 'partial-divider_salad_v2', 'partial-divider_tl', 'partial-divider_tl_v2', 'partial-divider_tomato', 'partial-divider_tomato_v2', 'plaza_salad', 'plaza_salad_v2', 'plaza_tl', 'plaza_tl_v2', 'plaza_tomato', 'plaza_tomato_v2']:
+     #for level in ['plaza_tl']:
+        # Example usage
+        map_file = rf'levels\{level}.txt'  # Path to your map file
+        pddl_output_file = rf'pddls\{level}.pddl'  # Path to save the PDDL file
+
+        state_vector, width, height, num_agents, num_objects = text_map_to_vector(map_file, 2)
+        state_to_pddl(state_vector, width, height, num_agents, num_objects, level, pddl_output_file)

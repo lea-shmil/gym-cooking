@@ -32,8 +32,8 @@ class OvercookedRLWrapper(Wrapper):
     def __init__(self, env):
         super().__init__(env)
         self.map_file = rf"utils\levels\{self.env.arglist.level}.txt"
-        self.vector, width, height, num_agents, num_objects = text_map_to_vector(self.map_file,
-                                                                                 self.env.arglist.num_agents)
+        self.vector, self.width, self.height, num_agents, self.num_objects = text_map_to_vector(self.map_file,
+                                                                                                self.env.arglist.num_agents)
         self.observation_space = Box(low=0, high=255, shape=(len(self.vector),), dtype=np.uint8)
         action_vec = [5] * num_agents  # 5 actions per agent
         self.action_space = MultiDiscrete(action_vec)  # MultiDiscrete action space for 1-4 agents
@@ -123,11 +123,6 @@ class OvercookedRLWrapper(Wrapper):
             y_end = y_start + dy
             end_loc = f"x{x_end}y{y_end}"
 
-            # Bounds check
-            if not (0 <= x_end < width and 0 <= y_end < height):
-                actions.append(f"(nop a{a + 1} )")
-                continue
-
             # Calculate destination tile properties
             dest_index = y_end * width + x_end
             dest = self.vector[dest_index]
@@ -148,7 +143,8 @@ class OvercookedRLWrapper(Wrapper):
                 if obj_x == x_start and obj_y == y_start:
                     object_held_index = i_start
 
-                if obj_x == x_end and obj_y == y_end:
+                # cant be the same object
+                if obj_x == x_end and obj_y == y_end and object_held_index != i_start:
                     object_dest_index = i_start
 
             # --- PDDL Action Logic ---
@@ -163,17 +159,19 @@ class OvercookedRLWrapper(Wrapper):
             for j in range(num_agents):
                 if a == j:
                     continue  # Skip checking against self
-            # Calculate the offset for the other agent 'j'
-            other_agent_offset = agent_start_offset + (j * AGENT_PROPERTIES)
-            other_x = int(self.vector[other_agent_offset + 1])
-            other_y = int(self.vector[other_agent_offset + 2])
 
-            if x_end == other_x and y_end == other_y:
-                is_blocked_by_other_agent = True
-                break
+                # Calculate the offset for the other agent 'j'
+                other_agent_offset = agent_start_offset + (j * AGENT_PROPERTIES)
+                other_x = int(self.vector[other_agent_offset + 1])
+                other_y = int(self.vector[other_agent_offset + 2])
+
+                if x_end == other_x and y_end == other_y:
+                    is_blocked_by_other_agent = True
+                    break
 
             # 3. Move Action
-            if dest_tile == "floor" and not is_blocked_by_other_agent:
+            if dest_tile == "floor" and not is_blocked_by_other_agent and 0 < x_end < width - 1 and \
+                    0 < y_end < height - 1 and (dx != 0 or dy != 0):
                 action = "move"
                 actions.append(f"({action} a{a + 1} {start_loc} {end_loc})")
 
@@ -185,7 +183,8 @@ class OvercookedRLWrapper(Wrapper):
                     self.vector[object_held_index + 2] = y_end
 
             # 4. Pickup Action
-            elif object_dest_index != -1 and object_held_index == -1:
+            elif (dest_tile == "counter" or dest_tile == "cutboard") and object_dest_index != -1 and \
+                    object_held_index == -1:
                 action = "pickup"
                 item_id = int(self.vector[object_dest_index])
                 item = f"o{item_id}"
@@ -194,7 +193,6 @@ class OvercookedRLWrapper(Wrapper):
 
                 self.vector[object_dest_index + 1] = x_start
                 self.vector[object_dest_index + 2] = y_start
-
 
             # 5. Chop Action
             elif (dest_tile == "cutboard" and object_dest_index == -1 and object_held_index != -1 and
@@ -222,7 +220,8 @@ class OvercookedRLWrapper(Wrapper):
             # 7. Put Down Action
             elif object_dest_index == -1 and object_held_index != -1:
                 #  split put-down into 3 actions based on destination tile and object properties
-                if dest_tile == "counter" and int(self.vector[object_held_index + is_cut_idx]) == 0:
+                if dest_tile == "counter" and int(self.vector[object_held_index + is_cut_idx]) == 0 and \
+                        int(self.vector[object_held_index + is_plate_idx]) == 0:
                     action = "put-down-unchopped-veggie"
                 elif (dest_tile == "cutboard" or dest_tile == "counter") \
                         and int(self.vector[object_held_index + is_cut_idx]) == 1:
@@ -231,7 +230,8 @@ class OvercookedRLWrapper(Wrapper):
                         and int(self.vector[object_held_index + is_plate_idx]) != 0:
                     action = "put-down-plate"
                 else:
-                    break
+                    actions.append(f"(nop a{a + 1})")
+                    continue
 
                 item_id = int(self.vector[object_held_index])
                 item = f"o{item_id}"
@@ -243,16 +243,16 @@ class OvercookedRLWrapper(Wrapper):
             elif object_held_index != -1 and object_dest_index != -1:
                 # held is plate and not merged and dest is chopped and not merged
                 if int(self.vector[object_held_index + is_plate_idx]) != 0 and \
-                    int(self.vector[object_held_index + is_cut_idx]) == 0 and \
-                    int(self.vector[object_dest_index + is_cut_idx]) == 1 and \
-                    int(self.vector[object_dest_index + is_plate_idx]) == 0:
+                        int(self.vector[object_held_index + is_cut_idx]) == 0 and \
+                        int(self.vector[object_dest_index + is_cut_idx]) == 1 and \
+                        int(self.vector[object_dest_index + is_plate_idx]) == 0:
 
                     action = "merge-plate"
                 # held is chopped and not merged and dest is plate and not merged
-                elif int(self.vector[object_held_index + is_cut_idx]) == 1 \
-                        and int(self.vector[object_dest_index + is_plate_idx]) != 0 \
-                        and int(self.vector[object_held_index + is_plate_idx]) == 0 \
-                        and int(self.vector[object_dest_index + is_cut_idx]) == 0: \
+                elif int(self.vector[object_held_index + is_cut_idx]) == 1 and \
+                        int(self.vector[object_dest_index + is_plate_idx]) != 0 and \
+                        int(self.vector[object_held_index + is_plate_idx]) == 0 and \
+                        int(self.vector[object_dest_index + is_cut_idx]) == 0:
 
                     action = "merge-plate-on-counter"
                 # both plates not merged
@@ -264,7 +264,8 @@ class OvercookedRLWrapper(Wrapper):
                     action = "merge-no-plate"
 
                 else:
-                    break
+                    actions.append(f"(nop a{a + 1})")
+                    continue
 
                 item_id_held = int(self.vector[object_held_index])
                 item = f"o{item_id_held}"
@@ -291,10 +292,8 @@ class OvercookedRLWrapper(Wrapper):
                 self.vector[object_dest_index + is_plate_idx] = 0
                 self.vector[object_dest_index + is_cut_idx] = 0
 
-
             # 9. Default Nop
             else:
-                actions.append(f"(nop a{a + 1} )")
-                continue
+                actions.append(f"(nop a{a + 1})")
 
         f.write(" ".join(actions) + ")\n")

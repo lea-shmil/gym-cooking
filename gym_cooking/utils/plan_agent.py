@@ -31,7 +31,8 @@ class plan_agent:
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 
         # Convert relative paths to absolute paths
-        domain_file = os.path.abspath(os.path.join(base_dir, "gym_cooking", "utils", "pddls", "gym-cooking.pddl"))
+        #domain_file = os.path.abspath(os.path.join(base_dir, "gym_cooking", "utils", "pddls", "gym-cooking.pddl"))
+        domain_file = os.path.abspath(os.path.join(base_dir,"gym_cooking", "masam_plan", "domain.pddl"))
         problem_file = os.path.abspath(
             os.path.join(base_dir, "gym_cooking", "utils", "pddls", f"{self.arglist.level}.pddl"))
         planner_script = os.path.abspath(
