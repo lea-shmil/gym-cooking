@@ -391,8 +391,8 @@ def get_state(pddl_file, state, world_width, world_height, agents, objects):
 
 if __name__ == '__main__':
 
-    for level in ['blocks_salad', 'blocks_salad_v2', 'blocks_tl', 'blocks_tl_v2', 'blocks_tomato', 'blocks_tomato_v2', 'credit-divider_salad', 'credit-divider_salad_v2', 'credit-divider_tl', 'credit-divider_tl_v2', 'credit-divider_tomato', 'credit-divider_tomato_v2', 'cubicle_salad', 'cubicle_salad_v2', 'cubicle_tl', 'cubicle_tl_v2', 'cubicle_tomato', 'cubicle_tomato_v2', 'full-divider_salad', 'full-divider_salad_v2', 'full-divider_tl', 'full-divider_tl_v2', 'full-divider_tomato', 'full-divider_tomato_v2', 'halfmap-divider_salad', 'halfmap-divider_salad_v2', 'halfmap-divider_tl', 'halfmap-divider_tl_v2', 'halfmap-divider_tomato', 'halfmap-divider_tomato_v2', 'large_tomato', 'large_tomato_3', 'open-divider_salad', 'open-divider_salad_v2', 'open-divider_tl', 'open-divider_tl_v2', 'open-divider_tomato', 'open-divider_tomato_v2', 'partial-divider_salad', 'partial-divider_salad_v2', 'partial-divider_tl', 'partial-divider_tl_v2', 'partial-divider_tomato', 'partial-divider_tomato_v2', 'plaza_salad', 'plaza_salad_v2', 'plaza_tl', 'plaza_tl_v2', 'plaza_tomato', 'plaza_tomato_v2']:
-     #for level in ['plaza_tl']:
+    for level in ["map1_tl", "map1_salad", "map1_tomato", "map1_tl_v2", "map1_salad_v2", "map1_tomato_v2", "map2_tl", "map2_salad", "map2_tomato", "map2_tl_v2", "map2_salad_v2", "map2_tomato_v2", "map3_tl", "map3_salad", "map3_tomato", "map3_tl_v2", "map3_salad_v2", "map3_tomato_v2", "map4_tl", "map4_salad", "map4_tomato", "map4_tl_v2", "map4_salad_v2", "map4_tomato_v2"]:
+        #for level in ['plaza_tl']:
         # Example usage
         map_file = rf'levels\{level}.txt'  # Path to your map file
         pddl_output_file = rf'pddls\{level}.pddl'  # Path to save the PDDL file

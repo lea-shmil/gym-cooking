@@ -15,7 +15,7 @@ class RLAgent:
         self.arglist = arglist
         self.env = env
         #, n_steps=100, batch_size=20
-        self.model = PPO("MlpPolicy", env, verbose=1) # ,seed=self.env.arglist.seed)
+        self.model = PPO("MlpPolicy", env, verbose=1,seed=self.env.arglist.seed)
         self.steps_taken = 0
         self.successful = False
         self.steps_to_success = 0
