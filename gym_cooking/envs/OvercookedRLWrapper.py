@@ -255,14 +255,24 @@ class OvercookedRLWrapper(Wrapper):
                         int(self.vector[object_dest_index + is_cut_idx]) == 0:
 
                     action = "merge-plate-on-counter"
-                # both plates not merged
+                # no plates involved, held is chopped lettuce and dest is chopped tomato
                 elif int(self.vector[object_held_index + is_cut_idx]) == 1 \
                         and int(self.vector[object_dest_index + is_cut_idx]) == 1 \
                         and int(self.vector[object_held_index + is_plate_idx]) == 0 \
-                        and int(self.vector[object_dest_index + is_plate_idx]) == 0:
+                        and int(self.vector[object_dest_index + is_plate_idx]) == 0 \
+                        and int(self.vector[object_held_index + is_lettuce_idx]) == 1 \
+                        and int(self.vector[object_dest_index + is_tomato_idx]) == 1:
 
-                    action = "merge-no-plate"
+                    action = "merge-no-plate-tomato"
+                elif int(self.vector[object_held_index + is_cut_idx]) == 1 \
+                        and int(self.vector[object_dest_index + is_cut_idx]) == 1 \
+                        and int(self.vector[object_held_index + is_plate_idx]) == 0 \
+                        and int(self.vector[object_dest_index + is_plate_idx]) == 0 \
+                        and int(self.vector[object_held_index + is_tomato_idx]) == 1 \
+                        and int(self.vector[object_dest_index + is_lettuce_idx]) == 1:
 
+                    action = "merge-no-plate-lettuce"
+                    # held is chopped tomato and dest is chopped lettuce
                 else:
                     actions.append(f"(nop a{a + 1})")
                     continue

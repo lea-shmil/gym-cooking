@@ -35,7 +35,7 @@ def parallel_execution(domain: str, problem: str, solution: str, agent_names: li
     # Log the content of the domain file for debugging
     with open(domain, "r") as domain_file:
         domain_content = domain_file.read()
-        print(f"Domain file content:\n{domain_content}")
+        #print(f"Domain file content:\n{domain_content}")
 
     # Parse the domain and problem files
     domain_parser = DomainParser(domain)

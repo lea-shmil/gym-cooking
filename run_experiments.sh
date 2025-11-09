@@ -4,7 +4,19 @@ source /c/Users/Administrator/anaconda3/etc/profile.d/conda.sh
 #source /c/Conda/etc/profile.d/conda.sh
 conda activate gym_cooking
 
-levels=('blocks_salad', 'blocks_tomato', 'blocks_tl', 'map1_salad', 'map1_tomato', 'map1_tl', 'map3_salad', 'map3_tl', 'map3_tomato')
+# --- FIX: Add project to PYTHONPATH ---
+# Get the absolute path to the directory where this script is located
+# (This is now the project root, which is what we want)
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+# Add that directory to Python's search path
+export PYTHONPATH="$SCRIPT_DIR:$PYTHONPATH"
+
+echo "Current Working Directory: $(pwd)"
+echo "Setting PYTHONPATH to: $PYTHONPATH"
+# --- END FIX ---
+
+
+levels=('blocks_salad' 'blocks_tomato' 'blocks_tl' 'map1_salad' 'map1_tomato' 'map1_tl' 'map3_salad' 'map3_tl' 'map3_tomato')
 #levels=('blocks_salad' 'blocks_salad_v2' 'blocks_tl' 'blocks_tl_v2' 'blocks_tomato' 'blocks_tomato_v2'   'full-divider_salad_v2' 'full-divider_tl' 'full-divider_tl_v2' 'full-divider_tomato' 'full-divider_tomato_v2'  'map1_salad' 'map1_tomato' 'map1_tl' 'map1_salad_v2' 'map1_tomato_v2' 'map1_tl_v2' 'map2_salad' 'map2_tomato' 'map2_tl' 'map2_salad_v2' 'map2_tomato_v2' 'map2_tl_v2', 'map3_salad' 'map3_tomato' 'map3_tl' 'map3_salad_v2' 'map3_tomato_v2' 'map3_tl_v2', 'map4_salad' 'map4_tomato' 'map4_tl' 'map4_salad_v2' 'map4_tomato_v2' 'map4_tl_v2')
 #models=("rl" "plan" "plan" "bd")
 models=("plan")
@@ -21,7 +33,7 @@ search2='astar(lmcut, bound=infinity, max_time=infinity, description="astar", ve
 #if we do cost_type=normal it will loop indefinitely
 
 #evaluator2="hcea=cea()"
-#search2='astar(hcea, pruning=stubborn_sets_simple(), cost_type=one, bound=infinity, max_time=300, description="astar", verbosity=normal)'
+#search2='astar(hcea, pruning=stubborn_sets_simple(), cost_type=one, bound=infinity, max_time=300,. description="astar", verbosity=normal)'
 
 plan_run_counter=0
 

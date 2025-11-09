@@ -31,8 +31,8 @@ class plan_agent:
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 
         # Convert relative paths to absolute paths
-        #domain_file = os.path.abspath(os.path.join(base_dir, "gym_cooking", "utils", "pddls", "gym-cooking.pddl"))
-        domain_file = os.path.abspath(os.path.join(base_dir,"gym_cooking", "masam_plan", "domain.pddl"))
+        domain_file = os.path.abspath(os.path.join(base_dir, "gym_cooking", "utils", "pddls", "gym-cooking.pddl"))
+        #domain_file = os.path.abspath(os.path.join(base_dir,"gym_cooking", "masam_plan", "domain.pddl"))
         problem_file = os.path.abspath(
             os.path.join(base_dir, "gym_cooking", "utils", "pddls", f"{self.arglist.level}.pddl"))
         planner_script = os.path.abspath(
@@ -69,7 +69,7 @@ class plan_agent:
             print(result)
 
             # Construct path to the sas_plan file inside gym_cooking directory
-            # gym_cooking/utils -> gym_cooking C:\Users\Administrator\Documents\GitHub\gym-cooking\gym_cooking\sas_plan
+            # gym_cooking/utils -> gym_cooking C:\Users\Administrator\Documents\GitHub\gym-cooking\sas_plan
             base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
             sas_plan_path = os.path.join(base_dir, "sas_plan")
 

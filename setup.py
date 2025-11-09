@@ -29,7 +29,7 @@ setup(name='gym_cooking',
             'tqdm==4.50.1',
             # lea added changes to use baselines
             'stable-baselines3==1.4.0',
-            'gymnasium[classic-control]==1.1.1'
+            'gymnasium[classic-control]==1.1.1',
             # for gymnasium we need a higher version of numpy
             'numpy==1.23.5'
           ]

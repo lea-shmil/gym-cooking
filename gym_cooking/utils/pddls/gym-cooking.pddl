@@ -161,7 +161,7 @@
   )
 )
 
-(:action merge-no-plate ; for putting chopped lettuce with chopped tomato
+(:action merge-no-plate-tomato ; holding chopped lettuce putting with chopped tomato
   :parameters (?a - agent ?agent_loc - cell ?target_loc - cell ?held_obj - veggieOrPlate ?counter_obj - veggieOrPlate)
   :precondition (and
     (agent_at ?a ?agent_loc)
@@ -173,11 +173,35 @@
     (not-plate ?held_obj) ; cannot merge plate with plate
     (not-plate ?counter_obj) ; cannot merge plate with plate
     (occupied ?target_loc)
+    (lettuce ?held_obj)
+    (tomato ?counter_obj)
   )
   :effect (and
     (not (object_at ?counter_obj ?target_loc))
     (not (occupied ?target_loc)) ; mark the cell as not occupied after merging
     (tomato ?held_obj)
+  )
+)
+
+
+(:action merge-no-plate-lettuce ; holding chopped tomato putting with chopped lettuce
+  :parameters (?a - agent ?agent_loc - cell ?target_loc - cell ?held_obj - veggieOrPlate ?counter_obj - veggieOrPlate)
+  :precondition (and
+    (agent_at ?a ?agent_loc)
+    (holding ?a ?held_obj)
+    (object_at ?counter_obj ?target_loc)
+    (adjacent ?agent_loc ?target_loc)
+    (chopped ?held_obj) ; cannot merge plate with tomato/lettuce
+    (chopped ?counter_obj) ; cannot merge plate with tomato/lettuce
+    (not-plate ?held_obj) ; cannot merge plate with plate
+    (not-plate ?counter_obj) ; cannot merge plate with plate
+    (occupied ?target_loc)
+    (tomato ?held_obj)
+    (lettuce ?counter_obj)
+  )
+  :effect (and
+    (not (object_at ?counter_obj ?target_loc))
+    (not (occupied ?target_loc)) ; mark the cell as not occupied after merging
     (lettuce ?held_obj)
   )
 )
