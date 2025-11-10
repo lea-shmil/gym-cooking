@@ -1,3 +1,0 @@
-Alg.,Map,Goal,Instance,Planning time(H:M:S:MS),Execution CPU time(H:M:S:MS),Steps,Success
-rl,map1_tomato,tomato,1,N/A,N/A,N/A,F
-rl,map1_tomato,tomato,1,N/A,00:01:25:390,2148,Y

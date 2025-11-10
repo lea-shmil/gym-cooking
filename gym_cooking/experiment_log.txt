@@ -1,5 +1,0 @@
-2025-11-09 15:17:23,352 - Running: python main.py --num-agents 4 --seed 1 --level map1_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
-2025-11-09 16:20:36,615 - Running: python main.py --num-agents 4 --seed 1 --level map1_tomato --model1 rl --model2 rl --search lazy_greedy([hcea], preferred=[hcea]) --evaluator hcea=cea() 
-2025-11-09 16:22:02,905 - Agent agent-1: Steps taken: 2148
-2025-11-09 16:22:02,905 - Time taken for map1_tomato with rl and rl: 85.39 seconds
-2025-11-09 16:22:02,905 - Experiment success: True

@@ -87,8 +87,8 @@ def fix_seed(seed):
 
 def initialize_agents(arglist, env, logger):
     real_agents = []
-
-    with open('utils/levels/{}.txt'.format(arglist.level), 'r') as f:
+    txt_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "gym_cooking", "utils", "levels", "{}.txt".format(arglist.level)))
+    with open(txt_path, 'r') as f:
         phase = 1
         recipes = []
         for line in f:

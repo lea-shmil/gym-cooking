@@ -31,7 +31,7 @@ OBJECT_PROPERTIES = 7
 class OvercookedRLWrapper(Wrapper):
     def __init__(self, env):
         super().__init__(env)
-        self.map_file = rf"utils\levels\{self.env.arglist.level}.txt"
+        self.map_file = rf"gym_cooking\utils\levels\{self.env.arglist.level}.txt"
         self.vector, self.width, self.height, num_agents, self.num_objects = text_map_to_vector(self.map_file,
                                                                                                 self.env.arglist.num_agents)
         self.observation_space = Box(low=0, high=255, shape=(len(self.vector),), dtype=np.uint8)
@@ -151,6 +151,8 @@ class OvercookedRLWrapper(Wrapper):
 
             # Note: Indexes are relative to the object's ID (index 0 of the object block)
             # 3: is_tomato, 4: is_lettuce, 5: is_plate, 6: is_cut
+            is_tomato_idx = 3
+            is_lettuce_idx = 4
             is_plate_idx = 5
             is_cut_idx = 6
 
@@ -286,8 +288,7 @@ class OvercookedRLWrapper(Wrapper):
                 actions.append(f"({action} a{a + 1} {end_loc} {item} {item_dest})")
 
                 # Merge properties onto the held object
-                is_tomato_idx = 3
-                is_lettuce_idx = 4
+
                 self.vector[object_held_index + is_plate_idx] = (
                     max(self.vector[object_held_index + is_plate_idx], self.vector[object_dest_index + is_plate_idx]))
                 self.vector[object_held_index + is_cut_idx] = \

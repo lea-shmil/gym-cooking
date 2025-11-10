@@ -19,8 +19,8 @@ class TrajectoryCallback(BaseCallback):
     def _on_training_start(self) -> None:
         # initialize pddl
         level_name = self.env.arglist.level
-        pddl_file_path = rf"utils\pddls\{level_name}.pddl"
-        map_file = rf"utils\levels\{level_name}.txt"
+        pddl_file_path = rf"gym_cooking\utils\pddls\{level_name}.pddl"
+        map_file = rf"gym_cooking\utils\levels\{level_name}.txt"
 
         state_vector, width, height, num_agents, num_objects = text_map_to_vector(map_file, self.env.arglist.num_agents)
         state_to_pddl(state_vector, width, height, num_agents, num_objects, level_name, pddl_file_path)

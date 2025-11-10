@@ -390,8 +390,7 @@ def get_state(pddl_file, state, world_width, world_height, agents, objects):
 
 
 if __name__ == '__main__':
-
-    for level in ["map1_tl", "map1_salad", "map1_tomato", "map1_tl_v2", "map1_salad_v2", "map1_tomato_v2", "map2_tl", "map2_salad", "map2_tomato", "map2_tl_v2", "map2_salad_v2", "map2_tomato_v2", "map3_tl", "map3_salad", "map3_tomato", "map3_tl_v2", "map3_salad_v2", "map3_tomato_v2", "map4_tl", "map4_salad", "map4_tomato", "map4_tl_v2", "map4_salad_v2", "map4_tomato_v2"]:
+    for level in ["blocks_salad", "blocks_tomato", "blocks_tl", "map1_tl", "map1_salad", "map1_tomato", "map1_tl_v2", "map1_salad_v2", "map1_tomato_v2", "map2_tl", "map2_salad", "map2_tomato", "map2_tl_v2", "map2_salad_v2", "map2_tomato_v2", "map3_tl", "map3_salad", "map3_tomato", "map3_tl_v2", "map3_salad_v2", "map3_tomato_v2", "map4_tl", "map4_salad", "map4_tomato", "map4_tl_v2", "map4_salad_v2", "map4_tomato_v2"]:
         #for level in ['plaza_tl']:
         # Example usage
         map_file = rf'levels\{level}.txt'  # Path to your map file

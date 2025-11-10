@@ -6,6 +6,9 @@ from pddl_plus_parser.multi_agent import PlanConverter
 from pddl_plus_parser.lisp_parsers import DomainParser, ProblemParser
 import logging
 
+from typing import Tuple
+
+from gym_cooking.utils.pddl_problem_generator import text_map_to_vector, state_to_pddl
 from gym_cooking.utils.plans.transfer_single import parallel_execution
 
 logging.root.setLevel(logging.ERROR)
@@ -28,15 +31,25 @@ class plan_agent:
 
     def _load_plan(self):
         # Define base directory
-        base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+        current_dir = os.path.dirname(os.path.abspath(__file__))
 
+        # Keep going up one level until we find the sentinel file.
+        while not os.path.exists(os.path.join(current_dir, "main.py")):
+            parent_dir = os.path.dirname(current_dir)
+            if parent_dir == current_dir:
+                # We've hit the filesystem root and didn't find it.
+                raise FileNotFoundError(f"Could not find project root (marker file main.py not found).")
+            current_dir = parent_dir
+
+        print(current_dir)
         # Convert relative paths to absolute paths
-        domain_file = os.path.abspath(os.path.join(base_dir, "gym_cooking", "utils", "pddls", "gym-cooking.pddl"))
-        #domain_file = os.path.abspath(os.path.join(base_dir,"gym_cooking", "masam_plan", "domain.pddl"))
+        domain_file = os.path.abspath(os.path.join(current_dir, "gym_cooking", "utils", "pddls", "gym-cooking.pddl"))
+        #domain_file = os.path.abspath(os.path.join(current_dir,"gym_cooking", "masam_plan", "domain.pddl"))
+
         problem_file = os.path.abspath(
-            os.path.join(base_dir, "gym_cooking", "utils", "pddls", f"{self.arglist.level}.pddl"))
+            os.path.join(current_dir, "gym_cooking", "utils", "pddls", f"{self.arglist.level}.pddl"))
         planner_script = os.path.abspath(
-            os.path.join(base_dir, "gym_cooking", "downward-release-24.06.1", "fast-downward.py"))
+            os.path.join(current_dir, "gym_cooking", "downward-release-24.06.1", "fast-downward.py"))
 
         # Ensure paths are compatible with the operating system
         if os.name == "posix":  # Unix-like systems
@@ -52,6 +65,10 @@ class plan_agent:
         os.makedirs(os.path.dirname(self.plan_file_path), exist_ok=True)
 
         if self.name == "agent-1":
+            #updating pddl based on current number of agents
+            map_file = os.path.join(current_dir, "gym_cooking", "utils", "levels", f"{self.arglist.level}.txt")
+            state_vector, width, height, num_agents, num_objects = text_map_to_vector(map_file, self.env.arglist.num_agents)
+            state_to_pddl(state_vector, width, height, num_agents, num_objects, self.arglist.level, problem_file)
             # Start timing the planning process
             start_time = time.perf_counter()
 
@@ -68,10 +85,7 @@ class plan_agent:
             result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             print(result)
 
-            # Construct path to the sas_plan file inside gym_cooking directory
-            # gym_cooking/utils -> gym_cooking C:\Users\Administrator\Documents\GitHub\gym-cooking\sas_plan
-            base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-            sas_plan_path = os.path.join(base_dir, "sas_plan")
+            sas_plan_path = os.path.join(current_dir, "sas_plan")
 
             #  remove last line from sas_plan file
             with open(sas_plan_path, "r") as file:
@@ -119,9 +133,32 @@ class plan_agent:
         print(f"Agent {self.name} loaded actions: {actions}")
         return actions
 
-    def _parse_action(self, action_line):
-        """Parse a textual action into an environment action."""
+    def _parse_coords(self, loc_string):
+        """
+        Parses a location string like 'x19y2' or 'x4y1' into (x, y) integers.
+        """
+        # This regex finds one or more digits (\d+) after 'x' and 'y'
+        match = re.search(r"x(\d+)y(\d+)", loc_string)
+
+        if not match:
+            print(f"Error: Could not parse coordinates from '{loc_string}'")
+            return 0, 0
+
+        x = int(match.group(1)) # The first group (digits after x)
+        y = int(match.group(2)) # The second group (digits after y)
+        return x, y
+
+    def _parse_action(self, action_line: str):
+        """
+        Parse a textual action line into a (dx, dy) environment action.
+        This version correctly handles multi-digit coordinates.
+        """
+        # Find all actions in the line, e.g., "(move a1...)" "(move a2...)"
         actions = re.findall(r'\(([^()]*)\)', action_line)
+
+        # Map actions by their order of appearance
+        # pair['1'] = "move a1 x19y2 x18y2"
+        # pair['2'] = "move a2 x5y5 x5y6"
         pair = {}
         if len(actions) >= 1:
             pair['1'] = actions[0]
@@ -132,20 +169,39 @@ class plan_agent:
         if len(actions) >= 4:
             pair['4'] = actions[3]
 
-        action = pair[self.name.split('-')[1]]  # agent 1 -> pair[1]
-        print(action)
-        if action == "nop ":  # Check if the action is for this agent
-            return 0, 0  # No-op if not for this agent
-        action = action.split(" ")
-        start = action[2]  # e.g., X4Y1
-        end = action[3]    # e.g., X5Y1
+        # Get the index for this agent (e.g., 'agent-1' -> '1')
+        agent_index = self.name.split('-')[1]
+
+        if agent_index not in pair:
+            # print(f"No action found for {self.name} in line.")
+            return 0, 0 # No-op
+
+        action_str = pair[agent_index]  # e.g., "move a1 x19y2 x18y2"
+
+        # Check for no-op
+        if "nop" in action_str:
+            return 0, 0
+
+        action_parts = action_str.split(" ")
+
+        if len(action_parts) < 4:
+            # Not a valid movement/interaction action
+            return 0, 0
+
+        start_str = action_parts[2]  # e.g., "x19y2"
+        end_str = action_parts[3]    # e.g., "x18y2"
+
+        # --- THIS IS THE FIX ---
+        # Use the new regex-based parser instead of fixed indices
+        start_x, start_y = self._parse_coords(start_str)
+        end_x, end_y = self._parse_coords(end_str)
+        # --- END OF FIX ---
 
         # Calculate the movement direction
-        start_x, start_y = int(start[1]), int(start[3])
-        end_x, end_y = int(end[1]), int(end[3])
         dx, dy = end_x - start_x, end_y - start_y
 
         return dx, dy
+
 
     def select_action(self):
         """Return the next action for the agent."""
