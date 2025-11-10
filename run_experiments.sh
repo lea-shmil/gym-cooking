@@ -19,10 +19,10 @@ echo "Setting PYTHONPATH to: $PYTHONPATH"
 levels=('blocks_salad' 'blocks_tomato' 'blocks_tl' 'map1_salad' 'map1_tomato' 'map1_tl' 'map3_salad' 'map3_tl' 'map3_tomato')
 #levels=('blocks_salad' 'blocks_salad_v2' 'blocks_tl' 'blocks_tl_v2' 'blocks_tomato' 'blocks_tomato_v2'   'full-divider_salad_v2' 'full-divider_tl' 'full-divider_tl_v2' 'full-divider_tomato' 'full-divider_tomato_v2'  'map1_salad' 'map1_tomato' 'map1_tl' 'map1_salad_v2' 'map1_tomato_v2' 'map1_tl_v2' 'map2_salad' 'map2_tomato' 'map2_tl' 'map2_salad_v2' 'map2_tomato_v2' 'map2_tl_v2', 'map3_salad' 'map3_tomato' 'map3_tl' 'map3_salad_v2' 'map3_tomato_v2' 'map3_tl_v2', 'map4_salad' 'map4_tomato' 'map4_tl' 'map4_salad_v2' 'map4_tomato_v2' 'map4_tl_v2')
 #models=("rl" "plan" "plan" "bd")
-models=("plan")
+models=("rl")
 
 nseed=1
-max_timesteps=100
+max_timesteps=1000
 # Define evaluator and search strategies
 evaluator1="hcea=cea()"
 search1="lazy_greedy([hcea], preferred=[hcea])"
@@ -70,13 +70,20 @@ for nagents in 2 3 4; do
         if [[ "$model" == "rl" ]]; then
           max_timesteps="--max-num-timesteps 10000"
         else
-          max_timesteps="--max-num-timesteps 100"
+          max_timesteps="--max-num-timesteps 1000"
         fi
 
+        # --- NEW: Dynamically build model arguments ---
+        model_args=""
+        for i in $(seq 1 $nagents); do
+          # This builds a string like: --model1 plan --model2 plan ...
+          model_args+="--model$i $model "
+        done
+        # --- END NEW ---
+
         echo "Running experiments with $max_timesteps, level=$level, model=$model, seed=$seed, nagents=$nagents, evaluator=$evaluator, search=$search"
-        # Use the $nagents variable from the new outer loop
-        python main.py $max_timesteps --num-agents $nagents --seed $seed --level $level --model1 $model --model2 $model --evaluator "$evaluator" --search "$search"
-        #python log_file_to_csv.py
+        # Use the $nagents variable from the new outer loop and the new $model_args
+        python main.py $max_timesteps --num-agents $nagents --seed $seed --level $level $model_args --evaluator "$evaluator" --search "$search"
         sleep 5
       done
     done
